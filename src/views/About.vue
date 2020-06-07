@@ -26,9 +26,10 @@
           <div class="card-block">
             <div class="card-title">{{registry.name}}</div>
             <div class="card-subtitle mb-2 text-muted">{{registry.category}}</div>
-            <div class="card-subtitle mb-2 text-muted">{{registry.type}}</div>
+            <div class="card-subtitle mb-2 text-muted">{{registry.type_search}}</div>
             <p class="card-text">{{registry.amount}}</p>
           </div>
+          <button class="btn btn-primary" @click="updateRegistry(index)">Update</button>  
           <button class="close" @click="delRegistry(index)">&times;</button>          
         </div>
       </div>
@@ -42,28 +43,21 @@ export default {
   data () {
     return {
       title: 'Registry of transaction',
-        typelist:[
-          {
-            name: 'Income'
-          },
-          {
-            name:'Expense'
-          }
-        ],
+      typelist: [
+       {
+          name: 'Income'
+       },
+       {
+          name:'Expense'
+       }
+     ],
       registry:{
         name:'',
         category:'',
         amount:'',
         type_search:'Income'
       },
-      registrys:[
-        {
-          name:'Salary',
-          category:'Dep',
-          type:'Income',
-          amount:'2500 Bs.'
-        }
-      ]
+      registrys: []
     }
   },
   methods:{
@@ -74,10 +68,31 @@ export default {
         category,
         amount,
         type_search
-      })
+      });
+      localStorage.setItem('reg-local', JSON.stringify(this.registrys));
     },
     delRegistry:function(index){
       this.registrys.splice(index, 1);
+            localStorage.setItem('reg-local', JSON.stringify(this.registrys));
+
+    },
+    updateRegistry:function(index){
+      this.registrys[index].name = this.registry.name;
+      this.registrys[index].category = this.registry.category;
+      this.registrys[index].type_search = this.registry.type_search;
+      this.registrys[index].amount = this.registry.amount; 
+      localStorage.setItem('reg-local', JSON.stringify(this.registrys));
+    }
+  },
+  created: function(){
+    let registrysDB = JSON.parse(localStorage.getItem('reg-local'));
+    if(registrysDB === null)
+    {
+      this.registrys = [];
+    }
+    else
+    {
+      this.registrys = registrysDB;
     }
   }
 }

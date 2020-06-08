@@ -22,7 +22,7 @@
     </div>
     <div class="col-sm-12">
       <div class="col-sm-8 nota" v-for="(registry, index) in registrys" :key="index">
-        <div :class="[registry.type_search ==='Income' ? 'card-income' : 'card-expense']">
+        <div :class="[registry.type_search ==='Income' ? 'card-income' : 'card-expense']" @click="prevUpdate(index)">
           <div class="card-block">
             <div class="card-title">{{registry.name}}</div>
             <div class="card-subtitle mb-2 text-muted">{{registry.category}}</div>
@@ -82,6 +82,12 @@ export default {
       this.registrys[index].type_search = this.registry.type_search;
       this.registrys[index].amount = this.registry.amount; 
       localStorage.setItem('reg-local', JSON.stringify(this.registrys));
+    },
+    prevUpdate:function(index){
+      this.registry.name = this.registrys[index].name;
+      this.registry.category = this.registrys[index].category;
+      this.registry.type_search = this.registrys[index].type_search;
+      this.registry.amount = this.registrys[index].amount; 
     }
   },
   created: function(){

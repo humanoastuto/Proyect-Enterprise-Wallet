@@ -2,6 +2,33 @@
   <div class="about" id="app">
     <h3>{{ title }}</h3>
     <div class="form">
+      <button class="btn btn-primary" @click="transfershow">Transfer</button>
+      <div id="myDIV">
+        <label>Transfer from: </label>
+        <select
+          class="browser-default custom-select"
+          v-model="registry.transferSource"
+        >
+          <option v-for="(registry, index) in registrys" :key="index">
+            {{ registry.name }}
+          </option>
+      </select>
+        <label>Transfer to: </label>
+        <select
+          class="browser-default custom-select"
+          v-model="registry.transferDestination"
+        >
+          <option v-for="(registry, index) in registrys" :key="index">
+            {{ registry.name }}
+          </option>
+      </select>
+        <label>Amount</label>
+        <input class="form-control" v-model="registry.transferAmount">
+        <button class="btn btn-primary" @click="transferRegistrySource(); transferRegistryDestination();">Transfer</button>
+      </div>
+
+
+
       <div class="form-group">
         <label>Name</label>
         <input class="form-control" type="text" v-model="registry.name">
@@ -71,7 +98,7 @@ export default {
       });
       localStorage.setItem('reg-local', JSON.stringify(this.registrys));
     },
-    delRegistry:function(index){
+    delRegistry: function(index) {
       this.registrys.splice(index, 1);
             localStorage.setItem('reg-local', JSON.stringify(this.registrys));
 
@@ -88,20 +115,55 @@ export default {
       this.registry.category = this.registrys[index].category;
       this.registry.type_search = this.registrys[index].type_search;
       this.registry.amount = this.registrys[index].amount; 
+    },
+     transfershow: function() {
+      var x = document.getElementById("myDIV");
+      if (x.style.display === "none") {
+        x.style.display = "block";
+      } else {
+        x.style.display = "none";
+      }
+    },
+    transferRegistrySource: function() {
+      let name = this.registry.transferSource;
+      let category = "Transfer";
+      let amount = this.registry.transferAmount;
+      let type_search = "Expense";
+
+      this.registrys.push({
+        name,
+        category,
+        amount,
+        type_search
+      });
+
+  },
+    transferRegistryDestination: function() {
+      let name = this.registry.transferDestination;
+      let category = "Transfer";
+      let amount = this.registry.transferAmount;
+      let type_search = "Income";
+
+      this.registrys.push({
+        name,
+        category,
+        amount,
+        type_search
+      });
     }
   },
+
   created: function(){
     let registrysDB = JSON.parse(localStorage.getItem('reg-local'));
-    if(registrysDB === null)
-    {
+    if (registrysDB === null) {
       this.registrys = [];
-    }
-    else
-    {
+    } else {
       this.registrys = registrysDB;
     }
   }
 }
+
+
 </script>
 
 <style>

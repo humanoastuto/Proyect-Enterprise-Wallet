@@ -22,7 +22,7 @@
     </div>
     <div class="col-sm-12">
       <div class="col-sm-8 nota" v-for="(registry, index) in registrys" :key="index">
-        <div class="card">
+        <div :class="[registry.type_search ==='Income' ? 'card-income' : 'card-expense']">
           <div class="card-block">
             <div class="card-title">{{registry.name}}</div>
             <div class="card-subtitle mb-2 text-muted">{{registry.category}}</div>
@@ -102,7 +102,16 @@ export default {
   .form{
     text-align: left;
   } 
-  .card{
+  .card-income{
+    background: lightgreen;
+    text-align: left;
+    border:1px solid #2c3e50;
+    border-radius: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+  } 
+  .card-expense{
+    background: lightcoral;
     text-align: left;
     border:1px solid #2c3e50;
     border-radius: 4px;

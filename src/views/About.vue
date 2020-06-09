@@ -188,7 +188,7 @@ export default {
         amount,
         type_search
       });
-      this.registry.amount = this.registrys[index].amount;
+      //this.registry.amount = this.registrys[index].amount;
     },
     cleanText: function() {
       this.registry.name = "";

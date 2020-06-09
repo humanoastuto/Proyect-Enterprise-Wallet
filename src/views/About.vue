@@ -18,7 +18,10 @@
         <label>Amount</label>
         <input class="form-control" v-model="registry.amount">
       </div>
-      <button class="btn btn-primary" @click="addRegistry">Add</button>        
+      <button class="btn btn-primary" @click="addRegistry">Add</button> 
+      <button class="btn btn-primary" @click="cleanText">Clean</button>    
+      <br>
+      <label>Total: {{ totalAmount }}</label> 
     </div>
     <div class="col-sm-12">
       <div class="col-sm-8 nota" v-for="(registry, index) in registrys" :key="index">
@@ -43,6 +46,7 @@ export default {
   data () {
     return {
       title: 'Registry of transaction',
+      total: 0,
       typelist: [
        {
           name: 'Income'
@@ -69,12 +73,15 @@ export default {
         amount,
         type_search
       });
+      this.registry.name = '';
+      this.registry.category = '';
+      this.registry.type_search = 'Income';
+      this.registry.amount = '';
       localStorage.setItem('reg-local', JSON.stringify(this.registrys));
     },
     delRegistry:function(index){
       this.registrys.splice(index, 1);
             localStorage.setItem('reg-local', JSON.stringify(this.registrys));
-
     },
     updateRegistry:function(index){
       this.registrys[index].name = this.registry.name;
@@ -88,6 +95,12 @@ export default {
       this.registry.category = this.registrys[index].category;
       this.registry.type_search = this.registrys[index].type_search;
       this.registry.amount = this.registrys[index].amount; 
+    },
+    cleanText:function(){
+      this.registry.name = '';
+      this.registry.category = '';
+      this.registry.type_search = 'Income';
+      this.registry.amount = ''; 
     }
   },
   created: function(){
@@ -100,7 +113,25 @@ export default {
     {
       this.registrys = registrysDB;
     }
+  },
+  computed:{
+    totalAmount() {
+      let tamount = 0;
+      this.registrys.forEach(function(registry){
+        registry.type_search === 'Income' 
+        ? tamount += parseInt(registry.amount)
+        : tamount -= parseInt(registry.amount);
+      });
+      return tamount;
+    }
   }
+  /*
+  totalAmount() {
+      return this.registrys.reduce(function(previous, current) {
+        return parseInt(previous.amount) + parseInt(current.amount);
+      }, 0);
+    }
+  */ 
 }
 </script>
 

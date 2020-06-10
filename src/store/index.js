@@ -28,19 +28,9 @@ export default new Vuex.Store({
     },*/
     mutateIncomeList(state, category) {
       state.categories.income.push(category);
-      /* state.categories.income.forEach(item => {
-        if (category.name !== "" && category.name !== item.name) {
-          state.categories.income.push(category);
-        }
-      });*/
     },
     mutateExpenseList(state, category) {
       state.categories.expense.push(category);
-      /* state.categories.expense.forEach(item => {
-        if (category.name !== "" && category.name !== item.name) {
-          state.categories.expense.push(category);
-        }
-      });*/
     }
   },
   getters: {

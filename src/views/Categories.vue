@@ -92,10 +92,11 @@ export default {
       } else if (this.selectedType === "Expense") {
         this.addExpenseCategory({ name: this.c_name });
       }
-      /*if (this.c_name === "" || this.selectedType === ""){
-        alert("You must complete all the fields");
-      } else {
-        if (
+      localStorage.setItem(
+        "reg-local-category",
+        JSON.stringify(this.getCategoryList)
+      );
+      /*if (
           this.getCategoryList.income.name !== this.c_name &&
           this.selectedType === "Income"
         ) {
@@ -117,6 +118,12 @@ export default {
     cancel: function() {
       this.c_name = "";
       this.selectedType = "";
+    },
+    created: function() {
+      let categoriesDB = JSON.parse(localStorage.getItem("reg-local-category"));
+      if (categoriesDB !== null) {
+        this.getCategoryList = categoriesDB;
+      }
     }
   }
 };
@@ -181,11 +188,28 @@ h1 {
 }
 
 .table {
-  padding: 15px;
-  margin-top: 15px;
+  padding: 30pt;
+  margin-top: 50pt;
   margin-left: auto;
   margin-right: auto;
   width: 450pt;
   border: 2px solid black;
+}
+.table tbody tr:nth-child(2n) td {
+  background: rgb(255, 255, 255);
+}
+.table td {
+  text-align: center;
+  padding: 10px;
+  border: 2px solid black;
+}
+.table th {
+  text-transform: uppercase;
+  text-align: center;
+  color: white;
+  padding: 10px;
+  min-width: 35px;
+  max-width: 140px;
+  background: black;
 }
 </style>

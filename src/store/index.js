@@ -23,14 +23,31 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    /* mutateCategoryList(state, category) {
-      state.categories.push(category);
-    },*/
     mutateIncomeList(state, category) {
-      state.categories.income.push(category);
+      var v = false;
+      state.categories.income.forEach(item_category => {
+        if (item_category.name === category.name) {
+          v = true;
+        }
+      });
+      if (v === true) {
+        alert("Category already exists");
+      } else {
+        state.categories.income.push(category);
+      }
     },
     mutateExpenseList(state, category) {
-      state.categories.expense.push(category);
+      var v = false;
+      state.categories.expense.forEach(item_category => {
+        if (item_category.name === category.name) {
+          v = true;
+        }
+      });
+      if (v === true) {
+        alert("Category already exists");
+      } else {
+        state.categories.expense.push(category);
+      }
     }
   },
   getters: {

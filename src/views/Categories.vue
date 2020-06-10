@@ -86,42 +86,29 @@ export default {
     addCategory: function() {
       if (this.c_name === "" || this.selectedType === "") {
         alert("You must complete all the fields");
-      }
-      if (this.selectedType === "Income") {
-        this.addIncomeCategory({ name: this.c_name });
-      } else if (this.selectedType === "Expense") {
-        this.addExpenseCategory({ name: this.c_name });
-      }
-      localStorage.setItem(
-        "reg-local-category",
-        JSON.stringify(this.getCategoryList)
-      );
-      /*if (
-          this.getCategoryList.income.name !== this.c_name &&
-          this.selectedType === "Income"
-        ) {
+      } else {
+        if (this.selectedType === "Income") {
           this.addIncomeCategory({ name: this.c_name });
-        } else if (
-          this.getCategoryList.expense.name !== this.c_name &&
-          this.selectedType === "Expense"
-        ) {
+        } else if (this.selectedType === "Expense") {
           this.addExpenseCategory({ name: this.c_name });
-        } else if (
-          (this.getCategoryList.income.name === this.c_name &&
-            this.selectedType === "Income") ||
-          (this.getCategoryList.expense.name === this.c_name &&
-            this.selectedType === "Expense")
-        ) {
-          alert("Category already exists");
-        }*/
+        }
+        localStorage.setItem(
+          "reg-local-category",
+          JSON.stringify(this.getCategoryList)
+        );
+      }
     },
     cancel: function() {
       this.c_name = "";
       this.selectedType = "";
     },
     created: function() {
-      let categoriesDB = JSON.parse(localStorage.getItem("reg-local-category"));
-      if (categoriesDB !== null) {
+      let categoriesDB = JSON.parse(
+        localStorage.getItem("reg-local-categories")
+      );
+      if (categoriesDB === null) {
+        this.getCategoryList = [];
+      } else {
         this.getCategoryList = categoriesDB;
       }
     }

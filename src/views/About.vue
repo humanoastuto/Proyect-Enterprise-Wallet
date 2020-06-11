@@ -148,13 +148,6 @@ export default {
         type_search
       });
       localStorage.setItem("reg-local", JSON.stringify(this.registrys));
-      /*
-      this.registry.name = '';
-      this.registry.category = '';
-      this.registry.type_search = 'Income';
-      this.registry.amount = '';
-      localStorage.setItem('reg-local', JSON.stringify(this.registrys));
-      */
     },
     delRegistry: function(index) {
       this.registrys.splice(index, 1);
@@ -206,7 +199,6 @@ export default {
         amount,
         type_search
       });
-      //this.registry.amount = this.registrys[index].amount;
     },
     cleanText: function() {
       this.registry.name = "";
@@ -239,13 +231,6 @@ export default {
       return this.getCategoryList;
     }
   }
-  /*
-  totalAmount() {
-      return this.registrys.reduce(function(previous, current) {
-        return parseInt(previous.amount) + parseInt(current.amount);
-      }, 0);
-    }
-  */
 };
 </script>
 

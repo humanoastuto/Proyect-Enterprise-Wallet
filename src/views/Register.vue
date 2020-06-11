@@ -32,9 +32,7 @@ export default {
       List: []
     };
   },
-  /*components: {
-    Accounts
-  },*/
+  components: {},
 
   methods: {
     addUser: function() {

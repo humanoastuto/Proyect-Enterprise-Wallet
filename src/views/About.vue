@@ -38,10 +38,6 @@
         <label>Name</label>
         <input class="form-control" type="text" v-model="registry.name" />
       </div>
-      <div class="form-group">
-        <label>Category</label>
-        <input class="form-control" v-model="registry.category" />
-      </div>
       <label>Type</label>
       <select
         class="browser-default custom-select"
@@ -51,6 +47,27 @@
           {{ type.name }}
         </option>
       </select>
+      <div>
+        <label>Category</label>
+        <select
+          class="browser-default custom-select"
+          v-model="registry.category"
+          v-if="registry.type_search === 'Income'"
+        >
+          <option v-for="(category, index) in categories.income" :key="index">
+            {{ category.name }}
+          </option>
+        </select>
+        <select
+          class="browser-default custom-select"
+          v-model="registry.category"
+          v-if="registry.type_search === 'Expense'"
+        >
+          <option v-for="(category, index) in categories.expense" :key="index">
+            {{ category.name }}
+          </option>
+        </select>
+      </div>
       <div class="form-group">
         <label>Amount</label>
         <input class="form-control" v-model="registry.amount" />
@@ -77,10 +94,10 @@
               {{ registry.name }}
             </div>
             <div class="card-subtitle mb-2 text-muted">
-              {{ registry.category }}
+              {{ registry.type_search }}
             </div>
             <div class="card-subtitle mb-2 text-muted">
-              {{ registry.type_search }}
+              {{ registry.category }}
             </div>
             <p class="card-text">
               {{ registry.amount }}
@@ -97,6 +114,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
   name: "About",
   data() {
@@ -207,6 +225,10 @@ export default {
           : (tamount -= parseInt(registry.amount));
       });
       return tamount;
+    },
+    ...mapGetters(["getCategoryList"]),
+    categories: function() {
+      return this.getCategoryList;
     }
   }
 };

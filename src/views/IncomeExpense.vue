@@ -1,5 +1,5 @@
 <template>
-  <div class="about" id="app">
+  <div class="incomeexpense" id="app">
     <h3>{{ title }}</h3>
     <div class="form">
       <button class="btn btn-primary" @click="transfershow">Transfer</button>
@@ -116,7 +116,7 @@
 <script>
 import { mapGetters } from "vuex";
 export default {
-  name: "About",
+  name: "IncomeExpense",
   data() {
     return {
       title: "Registry of transaction",

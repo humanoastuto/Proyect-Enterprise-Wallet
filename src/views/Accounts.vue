@@ -52,12 +52,14 @@ export default {
     if (usersDB === null) {
       this.usersList = [];
     } else {
-      //this.usersList = usersDB;
+      this.usersList = usersDB;
+      /*
       this.usersList.push({
         accountName: usersDB.accountName,
         name: usersDB.name,
         id: usersDB.id
       });
+      */
     }
   },
   computed: {}

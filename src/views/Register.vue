@@ -38,7 +38,7 @@ export default {
 
   methods: {
     addUser: function() {
-      let { accountName, name, id } = this.user;
+      const { accountName, name, id } = this.user;
       this.List.push({
         accountName,
         name,
@@ -47,8 +47,14 @@ export default {
       localStorage.setItem("reg-Users", JSON.stringify(this.List));
     }
   },
-
-  created: function() {},
+  created: function() {
+    const ListDB = JSON.parse(localStorage.getItem("reg-Users"));
+    if (ListDB === null) {
+      this.List = [];
+    } else {
+      this.List = ListDB;
+    }
+  },
   computed: {}
 };
 </script>

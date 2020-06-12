@@ -1,7 +1,60 @@
 <template>
   <div class="incomeexpense" id="app">
     <h3>{{ title }}</h3>
+
+    <div class="add-form" v-if="add_bool">
+      <div class="add-form-content">
+        <div class="form-group">
+          <label>Name</label>
+          <input class="form-control" type="text" v-model="registry.name" />
+        </div>
+        <label>Type</label>
+        <select
+          class="browser-default custom-select"
+          v-model="registry.type_search"
+        >
+          <option v-for="(type, index) in typelist" :key="index">
+            {{ type.name }}
+          </option>
+        </select>
+        <div>
+          <label>Category</label>
+          <select
+            class="browser-default custom-select"
+            v-model="registry.category"
+            v-if="registry.type_search === 'Income'"
+          >
+            <option v-for="(category, index) in categories.income" :key="index">
+              {{ category.name }}
+            </option>
+          </select>
+          <select
+            class="browser-default custom-select"
+            v-model="registry.category"
+            v-if="registry.type_search === 'Expense'"
+          >
+            <option
+              v-for="(category, index) in categories.expense"
+              :key="index"
+            >
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount</label>
+          <input class="form-control" v-model="registry.amount" />
+        </div>
+        <button class="btn btn-primary" @click="addRegistry">Add</button>
+        <button class="btn btn-primary" @click="cleanText">Clean</button>
+        <button class="close" @click="add_bool = false">&times;</button>
+      </div>
+    </div>
+
     <div class="form">
+      <button class="btn btn-primary" @click="add_bool = true">
+        Add Transaction
+      </button>
       <button class="btn btn-primary" @click="transfershow">Transfer</button>
       <div id="myDIV">
         <label>Transfer from: </label>
@@ -34,79 +87,39 @@
           Transfer
         </button>
       </div>
-      <div class="form-group">
-        <label>Name</label>
-        <input class="form-control" type="text" v-model="registry.name" />
-      </div>
-      <label>Type</label>
-      <select
-        class="browser-default custom-select"
-        v-model="registry.type_search"
-      >
-        <option v-for="(type, index) in typelist" :key="index">
-          {{ type.name }}
-        </option>
-      </select>
-      <div>
-        <label>Category</label>
-        <select
-          class="browser-default custom-select"
-          v-model="registry.category"
-          v-if="registry.type_search === 'Income'"
-        >
-          <option v-for="(category, index) in categories.income" :key="index">
-            {{ category.name }}
-          </option>
-        </select>
-        <select
-          class="browser-default custom-select"
-          v-model="registry.category"
-          v-if="registry.type_search === 'Expense'"
-        >
-          <option v-for="(category, index) in categories.expense" :key="index">
-            {{ category.name }}
-          </option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Amount</label>
-        <input class="form-control" v-model="registry.amount" />
-      </div>
-      <button class="btn btn-primary" @click="addRegistry">Add</button>
-      <button class="btn btn-primary" @click="cleanText">Clean</button>
       <br />
       <label>Total: {{ totalAmount }}</label>
-    </div>
-    <div class="col-sm-12">
-      <div
-        class="col-sm-8 nota"
-        v-for="(registry, index) in registrys"
-        :key="index"
-      >
+      <div class="col-sm-12">
         <div
-          :class="[
-            registry.type_search === 'Income' ? 'card-income' : 'card-expense'
-          ]"
-          @click="prevUpdate(index)"
+          class="col-sm-8 nota"
+          v-for="(registry, index) in registrys"
+          :key="index"
         >
-          <div class="card-block">
-            <div class="card-title">
-              {{ registry.name }}
+          <div
+            :class="[
+              registry.type_search === 'Income' ? 'card-income' : 'card-expense'
+            ]"
+            @click="prevUpdate(index)"
+          >
+            <div class="card-block">
+              <div class="card-title">
+                {{ registry.name }}
+              </div>
+              <div class="card-subtitle mb-2 text-muted">
+                {{ registry.type_search }}
+              </div>
+              <div class="card-subtitle mb-2 text-muted">
+                {{ registry.category }}
+              </div>
+              <p class="card-text">
+                {{ registry.amount }}
+              </p>
             </div>
-            <div class="card-subtitle mb-2 text-muted">
-              {{ registry.type_search }}
-            </div>
-            <div class="card-subtitle mb-2 text-muted">
-              {{ registry.category }}
-            </div>
-            <p class="card-text">
-              {{ registry.amount }}
-            </p>
+            <button class="btn btn-primary" @click="updateRegistry(index)">
+              Update
+            </button>
+            <button class="close" @click="delRegistry(index)">&times;</button>
           </div>
-          <button class="btn btn-primary" @click="updateRegistry(index)">
-            Update
-          </button>
-          <button class="close" @click="delRegistry(index)">&times;</button>
         </div>
       </div>
     </div>
@@ -121,6 +134,7 @@ export default {
     return {
       title: "Registry of transaction",
       total: 0,
+      add_bool: false,
       typelist: [
         {
           name: "Income"
@@ -148,6 +162,7 @@ export default {
         type_search
       });
       localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+      this.cleanText();
     },
     delRegistry: function(index) {
       this.registrys.splice(index, 1);
@@ -256,5 +271,26 @@ export default {
 }
 .nota {
   padding: 5px;
+}
+
+.add-form {
+  background: rgba(0, 0, 0, 0.6);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.add-form-content {
+  height: 380px;
+  width: 500px;
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  position: relative;
 }
 </style>

@@ -17,7 +17,10 @@
           class="browser-default custom-select"
           v-model="registry.transferDestination"
         >
-          <option v-for="(account, index) in dropdownListDestination" :key="index">
+          <option
+            v-for="(account, index) in dropdownListDestination"
+            :key="index"
+          >
             {{ account.name }}
           </option>
         </select>
@@ -118,10 +121,14 @@ export default {
       localStorage.setItem("reg-local", JSON.stringify(this.registrys));
     },
     prevUpdate: function(index) {
-      this.registry.name = this.registrys[index].name;
-      this.registry.category = this.registrys[index].category;
-      this.registry.type_search = this.registrys[index].type_search;
-      this.registry.amount = this.registrys[index].amount;
+      try {
+        this.registry.name = this.registrys[index].name;
+        this.registry.category = this.registrys[index].category;
+        this.registry.type_search = this.registrys[index].type_search;
+        this.registry.amount = this.registrys[index].amount;
+      } catch (error) {
+        console.log("Undefined variable as it's non existent");
+      }
     },
     transfershow: function() {
       var x = document.getElementById("myDIV");
@@ -197,14 +204,16 @@ export default {
     categories: function() {
       return this.getCategoryList;
     },
-    dropdownListDestination()
-    {
-        return this.accounts.filter(item => item.name !== this.registry.transferSource);
+    dropdownListDestination() {
+      return this.accounts.filter(
+        item => item.name !== this.registry.transferSource
+      );
     },
-    dropdownListSource()
-    {
-        return this.accounts.filter(item => item.name !== this.registry.transferDestination);
-    },
+    dropdownListSource() {
+      return this.accounts.filter(
+        item => item.name !== this.registry.transferDestination
+      );
+    }
   }
 };
 </script>

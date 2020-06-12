@@ -46,7 +46,16 @@
           <input class="form-control" v-model="registry.amount" />
         </div>
         <button class="btn btn-success" @click="addRegistry">Add</button>
-        <button class="btn btn-danger" @click="add_bool = false; cleanText()" style="margin-left: 20px;">Cancel</button>
+        <button
+          class="btn btn-danger"
+          @click="
+            add_bool = false;
+            cleanText();
+          "
+          style="margin-left: 20px;"
+        >
+          Cancel
+        </button>
       </div>
     </div>
 
@@ -96,7 +105,16 @@
         <button class="btn btn-success" @click="updateRegistry(index_upd)">
           Update
         </button>
-        <button class="btn btn-danger" style="margin-left: 20px;" @click="upd_bool = false; cleanText()">Cancel</button>
+        <button
+          class="btn btn-danger"
+          style="margin-left: 20px;"
+          @click="
+            upd_bool = false;
+            cleanText();
+          "
+        >
+          Cancel
+        </button>
       </div>
     </div>
 
@@ -195,10 +213,14 @@ export default {
       this.cleanText();
     },
     prevUpdate: function(index) {
-      this.registry.name = this.registrys[index].name;
-      this.registry.category = this.registrys[index].category;
-      this.registry.type_search = this.registrys[index].type_search;
-      this.registry.amount = this.registrys[index].amount;
+      try {
+        this.registry.name = this.registrys[index].name;
+        this.registry.category = this.registrys[index].category;
+        this.registry.type_search = this.registrys[index].type_search;
+        this.registry.amount = this.registrys[index].amount;
+      } catch (error) {
+        console.log("Undefined variable as it's non existent");
+      }
       this.upd_bool = true;
       this.index_upd = index;
     },

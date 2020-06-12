@@ -8,7 +8,7 @@
           class="browser-default custom-select"
           v-model="registry.transferSource"
         >
-          <option v-for="(account, index) in accounts" :key="index">
+          <option v-for="(account, index) in dropdownListSource" :key="index">
             {{ account.name }}
           </option>
         </select>
@@ -17,7 +17,7 @@
           class="browser-default custom-select"
           v-model="registry.transferDestination"
         >
-          <option v-for="(account, index) in accounts" :key="index">
+          <option v-for="(account, index) in dropdownListDestination" :key="index">
             {{ account.name }}
           </option>
         </select>
@@ -196,7 +196,15 @@ export default {
     ...mapGetters(["getCategoryList"]),
     categories: function() {
       return this.getCategoryList;
-    }
+    },
+    dropdownListDestination()
+    {
+        return this.accounts.filter(item => item.name !== this.registry.transferSource);
+    },
+    dropdownListSource()
+    {
+        return this.accounts.filter(item => item.name !== this.registry.transferDestination);
+    },
   }
 };
 </script>

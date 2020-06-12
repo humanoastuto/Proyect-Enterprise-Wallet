@@ -119,7 +119,6 @@ export default {
 <style>
 .form {
   text-align: left;
-  font-family: "Times New Roman", Times, serif;
   padding: 30pt;
 }
 .c_btn {
@@ -152,8 +151,6 @@ export default {
 }
 
 h1 {
-  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   color: black;
   font-size: 3em;
   text-align: center;

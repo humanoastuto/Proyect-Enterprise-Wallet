@@ -2,7 +2,6 @@
   <div class="transfer" id="app">
     <h3>{{ title }}</h3>
     <div class="form">
-      <button class="btn btn-primary" @click="transfershow">Transfer</button>
       <div id="myDIV">
         <label>Transfer from: </label>
         <select
@@ -34,46 +33,7 @@
           Transfer
         </button>
       </div>
-      <div class="form-group">
-        <label>Name</label>
-        <input class="form-control" type="text" v-model="registry.name" />
-      </div>
-      <label>Type</label>
-      <select
-        class="browser-default custom-select"
-        v-model="registry.type_search"
-      >
-        <option v-for="(type, index) in typelist" :key="index">
-          {{ type.name }}
-        </option>
-      </select>
-      <div>
-        <label>Category</label>
-        <select
-          class="browser-default custom-select"
-          v-model="registry.category"
-          v-if="registry.type_search === 'Income'"
-        >
-          <option v-for="(category, index) in categories.income" :key="index">
-            {{ category.name }}
-          </option>
-        </select>
-        <select
-          class="browser-default custom-select"
-          v-model="registry.category"
-          v-if="registry.type_search === 'Expense'"
-        >
-          <option v-for="(category, index) in categories.expense" :key="index">
-            {{ category.name }}
-          </option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Amount</label>
-        <input class="form-control" v-model="registry.amount" />
-      </div>
-      <button class="btn btn-primary" @click="addRegistry">Add</button>
-      <button class="btn btn-primary" @click="cleanText">Clean</button>
+      <label>Amount</label>
       <br />
       <label>Total: {{ totalAmount }}</label>
     </div>

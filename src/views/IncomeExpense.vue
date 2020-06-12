@@ -55,40 +55,8 @@
       <button class="btn btn-primary" @click="add_bool = true">
         Add Transaction
       </button>
-      <button class="btn btn-primary" @click="transfershow">Transfer</button>
-      <div id="myDIV">
-        <label>Transfer from: </label>
-        <select
-          class="browser-default custom-select"
-          v-model="registry.transferSource"
-        >
-          <option v-for="(registry, index) in registrys" :key="index">
-            {{ registry.name }}
-          </option>
-        </select>
-        <label>Transfer to: </label>
-        <select
-          class="browser-default custom-select"
-          v-model="registry.transferDestination"
-        >
-          <option v-for="(registry, index) in registrys" :key="index">
-            {{ registry.name }}
-          </option>
-        </select>
-        <label>Amount</label>
-        <input class="form-control" v-model="registry.transferAmount" />
-        <button
-          class="btn btn-primary"
-          @click="
-            transferRegistrySource();
-            transferRegistryDestination();
-          "
-        >
-          Transfer
-        </button>
-      </div>
       <br />
-      <label>Total: {{ totalAmount }}</label>
+      <label>Total Amount: {{ totalAmount }}</label>
       <div class="col-xs-12">
         <div
           class="col-xs-8 nota"
@@ -180,40 +148,6 @@ export default {
       this.registry.category = this.registrys[index].category;
       this.registry.type_search = this.registrys[index].type_search;
       this.registry.amount = this.registrys[index].amount;
-    },
-    transfershow: function() {
-      var x = document.getElementById("myDIV");
-      if (x.style.display === "none") {
-        x.style.display = "block";
-      } else {
-        x.style.display = "none";
-      }
-    },
-    transferRegistrySource: function() {
-      let name = this.registry.transferSource;
-      let category = "Transfer";
-      let amount = this.registry.transferAmount;
-      let type_search = "Expense";
-
-      this.registrys.push({
-        name,
-        category,
-        amount,
-        type_search
-      });
-    },
-    transferRegistryDestination: function() {
-      let name = this.registry.transferDestination;
-      let category = "Transfer";
-      let amount = this.registry.transferAmount;
-      let type_search = "Income";
-
-      this.registrys.push({
-        name,
-        category,
-        amount,
-        type_search
-      });
     },
     cleanText: function() {
       this.registry.name = "";

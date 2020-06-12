@@ -89,9 +89,9 @@
       </div>
       <br />
       <label>Total: {{ totalAmount }}</label>
-      <div class="col-sm-12">
+      <div class="col-xs-12">
         <div
-          class="col-sm-8 nota"
+          class="col-xs-8 nota"
           v-for="(registry, index) in registrys"
           :key="index"
         >

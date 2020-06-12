@@ -8,8 +8,8 @@
           class="browser-default custom-select"
           v-model="registry.transferSource"
         >
-          <option v-for="(registry, index) in registrys" :key="index">
-            {{ registry.name }}
+          <option v-for="(account, index) in accounts" :key="index">
+            {{ account.name }}
           </option>
         </select>
         <label>Transfer to: </label>
@@ -17,25 +17,23 @@
           class="browser-default custom-select"
           v-model="registry.transferDestination"
         >
-          <option v-for="(registry, index) in registrys" :key="index">
-            {{ registry.name }}
+          <option v-for="(account, index) in accounts" :key="index">
+            {{ account.name }}
           </option>
         </select>
         <label>Amount</label>
         <input class="form-control" v-model="registry.transferAmount" />
         <button
-          class="btn btn-primary"
-          @click="
-            transferRegistrySource();
-            transferRegistryDestination();
-          "
+          class="btn btn-primary btn-primary-left"
+          @click="transferRegistry()"
         >
           Transfer
         </button>
+        <button class="btn btn-primary" @click="cleanText">Clean</button>
       </div>
-      <label>Amount</label>
+      <label></label>
       <br />
-      <label>Total: {{ totalAmount }}</label>
+      <label>Total Amount: {{ totalAmount }}</label>
     </div>
     <div class="col-sm-12">
       <div
@@ -93,22 +91,21 @@ export default {
         name: "",
         category: "",
         amount: "",
-        type_search: "Income"
+        type_search: "Income",
+        transferSource: "",
+        transferDestination: "",
+        transferAmount: ""
       },
-      registrys: []
+      account: {
+        accountName: "",
+        name: "",
+        id: ""
+      },
+      registrys: [],
+      accounts: []
     };
   },
   methods: {
-    addRegistry: function() {
-      let { name, category, amount, type_search } = this.registry;
-      this.registrys.push({
-        name,
-        category,
-        amount,
-        type_search
-      });
-      localStorage.setItem("reg-local", JSON.stringify(this.registrys));
-    },
     delRegistry: function(index) {
       this.registrys.splice(index, 1);
       localStorage.setItem("reg-local", JSON.stringify(this.registrys));
@@ -134,46 +131,56 @@ export default {
         x.style.display = "none";
       }
     },
-    transferRegistrySource: function() {
-      let name = this.registry.transferSource;
-      let category = "Transfer";
-      let amount = this.registry.transferAmount;
-      let type_search = "Expense";
-
-      this.registrys.push({
-        name,
-        category,
-        amount,
-        type_search
-      });
+    transferRegistry: function() {
+      if (
+        this.registry.transferSource === "" ||
+        this.registry.transferDestination === "" ||
+        this.registry.transferAmount === ""
+      ) {
+        alert("You must complete all the fields");
+      } else {
+        let name = this.registry.transferSource;
+        let category = "Transfer";
+        let amount = this.registry.transferAmount;
+        let type_search = "Expense";
+        this.registrys.push({
+          name,
+          category,
+          amount,
+          type_search
+        });
+        name = this.registry.transferDestination;
+        category = "Transfer";
+        amount = this.registry.transferAmount;
+        type_search = "Income";
+        this.registrys.push({
+          name,
+          category,
+          amount,
+          type_search
+        });
+      }
     },
-    transferRegistryDestination: function() {
-      let name = this.registry.transferDestination;
-      let category = "Transfer";
-      let amount = this.registry.transferAmount;
-      let type_search = "Income";
 
-      this.registrys.push({
-        name,
-        category,
-        amount,
-        type_search
-      });
-    },
     cleanText: function() {
-      this.registry.name = "";
-      this.registry.category = "";
-      this.registry.type_search = "Income";
-      this.registry.amount = "";
+      this.registry.transferSource = "";
+      this.registry.transferDestination = "";
+      this.registry.transferAmount = "";
     }
   },
 
   created: function() {
-    let registrysDB = JSON.parse(localStorage.getItem("reg-local"));
+    const registrysDB = JSON.parse(localStorage.getItem("reg-local"));
+    const accountsDB = JSON.parse(localStorage.getItem("reg-Users"));
     if (registrysDB === null) {
       this.registrys = [];
     } else {
       this.registrys = registrysDB;
+    }
+    if (accountsDB === null) {
+      this.accounts = [];
+    } else {
+      this.accounts = accountsDB;
     }
   },
   computed: {
@@ -216,5 +223,8 @@ export default {
 }
 .nota {
   padding: 5px;
+}
+.btn-primary-left {
+  margin-right: 20px;
 }
 </style>

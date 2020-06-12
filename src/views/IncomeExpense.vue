@@ -45,14 +45,63 @@
           <label>Amount</label>
           <input class="form-control" v-model="registry.amount" />
         </div>
-        <button class="btn btn-primary" @click="addRegistry">Add</button>
-        <button class="btn btn-primary" @click="cleanText">Clean</button>
-        <button class="close" @click="add_bool = false">&times;</button>
+        <button class="btn btn-success" @click="addRegistry">Add</button>
+        <button class="btn btn-danger" @click="add_bool = false; cleanText()" style="margin-left: 20px;">Cancel</button>
+      </div>
+    </div>
+
+    <div class="add-form" v-if="upd_bool">
+      <div class="add-form-content">
+        <div class="form-group">
+          <label>Name</label>
+          <input class="form-control" type="text" v-model="registry.name" />
+        </div>
+        <label>Type</label>
+        <select
+          class="browser-default custom-select"
+          v-model="registry.type_search"
+        >
+          <option v-for="(type, index) in typelist" :key="index">
+            {{ type.name }}
+          </option>
+        </select>
+        <div>
+          <label>Category</label>
+          <select
+            class="browser-default custom-select"
+            v-model="registry.category"
+            v-if="registry.type_search === 'Income'"
+          >
+            <option v-for="(category, index) in categories.income" :key="index">
+              {{ category.name }}
+            </option>
+          </select>
+          <select
+            class="browser-default custom-select"
+            v-model="registry.category"
+            v-if="registry.type_search === 'Expense'"
+          >
+            <option
+              v-for="(category, index) in categories.expense"
+              :key="index"
+            >
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount</label>
+          <input class="form-control" v-model="registry.amount" />
+        </div>
+        <button class="btn btn-success" @click="updateRegistry(index_upd)">
+          Update
+        </button>
+        <button class="btn btn-danger" style="margin-left: 20px;" @click="upd_bool = false; cleanText()">Cancel</button>
       </div>
     </div>
 
     <div class="form">
-      <button class="btn btn-primary" @click="add_bool = true">
+      <button class="btn btn-success" @click="add_bool = true">
         Add Transaction
       </button>
       <br />
@@ -70,6 +119,7 @@
             @click="prevUpdate(index)"
           >
             <div class="card-block">
+              <button class="close" @click="delRegistry(index)">&times;</button>
               <div class="card-title">
                 {{ registry.name }}
               </div>
@@ -83,10 +133,6 @@
                 {{ registry.amount }}
               </p>
             </div>
-            <button class="btn btn-primary" @click="updateRegistry(index)">
-              Update
-            </button>
-            <button class="close" @click="delRegistry(index)">&times;</button>
           </div>
         </div>
       </div>
@@ -103,6 +149,8 @@ export default {
       title: "Registry of transaction",
       total: 0,
       add_bool: false,
+      upd_bool: false,
+      index_upd: 0,
       typelist: [
         {
           name: "Income"
@@ -130,6 +178,7 @@ export default {
         type_search
       });
       localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+      this.add_bool = false;
       this.cleanText();
     },
     delRegistry: function(index) {
@@ -142,12 +191,16 @@ export default {
       this.registrys[index].type_search = this.registry.type_search;
       this.registrys[index].amount = this.registry.amount;
       localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+      this.upd_bool = false;
+      this.cleanText();
     },
     prevUpdate: function(index) {
       this.registry.name = this.registrys[index].name;
       this.registry.category = this.registrys[index].category;
       this.registry.type_search = this.registrys[index].type_search;
       this.registry.amount = this.registrys[index].amount;
+      this.upd_bool = true;
+      this.index_upd = index;
     },
     cleanText: function() {
       this.registry.name = "";
@@ -186,6 +239,7 @@ export default {
 <style>
 .form {
   text-align: left;
+  margin: 30px;
 }
 .card-income {
   background: lightgreen;

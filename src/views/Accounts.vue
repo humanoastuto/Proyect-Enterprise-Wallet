@@ -7,8 +7,8 @@
         v-for="(user, index) in usersList"
         :key="index"
       >
-        <div>
-          <div class="card-block1">
+        <div class="card-sytle">
+          <div>
             <div class="card-title1">
               {{ user.accountName }}
             </div>
@@ -17,6 +17,7 @@
             </div>
             <div class="card-subtitle mb-2 text-muted">ID: {{ user.id }}</div>
           </div>
+          <button class="close" @click="deleteUser(index)">&times;</button>
         </div>
       </div>
     </div>
@@ -45,6 +46,10 @@ export default {
         id
       });
       localStorage.setItem("reg-Users", JSON.stringify(this.usersList));
+    },
+    deleteUser: function(index) {
+      this.usersList.splice(index, 1);
+      localStorage.setItem("reg-Users", JSON.stringify(this.usersList));
     }
   },
   created: function() {
@@ -63,15 +68,14 @@ export default {
 .form {
   text-align: left;
 }
-.card-block1 {
+.card-sytle {
   background: rgb(182, 189, 182);
   text-align: left;
   border: 1px solid #2c3e50;
   border-radius: 4px;
   padding-left: 8px;
   padding-right: 8px;
-  margin-left: auto;
-  margin-right: auto;
+  padding-bottom: 25px;
 }
 .nota {
   padding: 5px;

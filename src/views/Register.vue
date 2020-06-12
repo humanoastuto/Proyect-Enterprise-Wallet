@@ -14,7 +14,6 @@
       <input class="form-control" type="text" v-model="user.id" />
     </div>
     <button class="btn btn-primary" @click="addUser">Register</button>
-    <!--Accounts :listData: List /-->
   </div>
 </template>
 

@@ -6,7 +6,11 @@
       <div class="add-form-content">
         <div class="form-group">
           <label>Name</label>
-          <input class="form-control" type="text" v-model="registry.name" />
+          <select class="browser-default custom-select" v-model="registry.name">
+            <option v-for="(account, index) in accounts" :key="index">
+              {{ account.name }}
+            </option>
+          </select>
         </div>
         <label>Type</label>
         <select
@@ -183,21 +187,36 @@ export default {
         amount: "",
         type_search: "Income"
       },
-      registrys: []
+      account: {
+        accountName: "",
+        name: "",
+        id: ""
+      },
+      registrys: [],
+      accounts: []
     };
   },
   methods: {
     addRegistry: function() {
       let { name, category, amount, type_search } = this.registry;
-      this.registrys.push({
-        name,
-        category,
-        amount,
-        type_search
-      });
-      localStorage.setItem("reg-local", JSON.stringify(this.registrys));
-      this.add_bool = false;
-      this.cleanText();
+      if (
+        this.registry.name === "" ||
+        this.registry.category === "" ||
+        this.registry.amount === "" ||
+        this.registry.type_search === ""
+      ) {
+        alert("You must complete all the fields");
+      } else {
+        this.registrys.push({
+          name,
+          category,
+          amount,
+          type_search
+        });
+        localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+        this.add_bool = false;
+        this.cleanText();
+      }
     },
     delRegistry: function(index) {
       this.registrys.splice(index, 1);
@@ -234,10 +253,16 @@ export default {
 
   created: function() {
     let registrysDB = JSON.parse(localStorage.getItem("reg-local"));
+    let accountsDB = JSON.parse(localStorage.getItem("reg-Users"));
     if (registrysDB === null) {
       this.registrys = [];
     } else {
       this.registrys = registrysDB;
+    }
+    if (accountsDB === null) {
+      this.accounts = [];
+    } else {
+      this.accounts = accountsDB;
     }
   },
   computed: {

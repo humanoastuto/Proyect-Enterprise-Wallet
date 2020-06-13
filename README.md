@@ -51,15 +51,13 @@ Task-Changes
 2: Categories can use localStorage instead of state management, not mandatory as its for phase 2 and it's well developed
 
 Task-I/E (inside IncomeExpense.vue)
-1: i/e must use account list for task 2
-2: Change input Name for a select from Account list in i/e register
-3: Add condition if its null, it wont search for incomes in the list
 4: Only integer/doubles allowed for amounts
 
 Task-Transfer (inside Transfer.vue)
 // A es el emisor (Transfer from:), B es el Receptor (Transfer to:)
 // El 4 se refiere a que si un usuario hace la transferencia, que no se vea en la lista de los que pueden recibir esa transferencia
 4: If A already selected an user, do not show A user for B possible accounts, same for B being selected
+6: Only integer/doubles allowed for amounts
 
 Task-Reports
 1: Show i/e of each user order by date

@@ -1,13 +1,14 @@
 <template>
   <div id="app">
-    <div id="nav">
+    <nav class="navbar navbar-dark" style="background-color: #4cae4c; padding: 15px;">
+      <span class="navbar-brand mb-0 h1">Virtual Wallet</span>
       <router-link to="/">Home</router-link> |
       <router-link to="/incomeexpense">IncomeExpense</router-link> |
       <router-link to="/transfer">Transfer</router-link> |
       <router-link to="/register">Register</router-link> |
       <router-link to="/accounts">Accounts</router-link> |
       <router-link to="/categories">Categories</router-link>
-    </div>
+    </nav>
     <router-view />
   </div>
 </template>
@@ -19,19 +20,23 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin: 20px;
 }
 
 #nav {
   padding: 30px;
 }
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
+a {
+  font-weight: lighter;
+  color: #dddcdc;
+  font-size: 20px;
 }
 
-#nav a.router-link-exact-active {
-  color: #42b983;
+a.router-link-exact-active {
+  color: #ffffff;
+}
+
+a.router-link-active {
+  color: #ffffff;
 }
 </style>

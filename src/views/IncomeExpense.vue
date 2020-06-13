@@ -6,7 +6,11 @@
       <div class="add-form-content">
         <div class="form-group">
           <label>Name</label>
-          <input class="form-control" type="text" v-model="registry.name" />
+          <select class="browser-default custom-select" v-model="registry.name">
+            <option v-for="(account, index) in accounts" :key="index">
+              {{ account.name }}
+            </option>
+          </select>
         </div>
         <label>Type</label>
         <select
@@ -45,14 +49,85 @@
           <label>Amount</label>
           <input class="form-control" v-model="registry.amount" />
         </div>
-        <button class="btn btn-primary" @click="addRegistry">Add</button>
-        <button class="btn btn-primary" @click="cleanText">Clean</button>
-        <button class="close" @click="add_bool = false">&times;</button>
+        <button class="btn btn-success" @click="addRegistry">Add</button>
+        <button
+          class="btn btn-danger"
+          @click="
+            add_bool = false;
+            cleanText();
+          "
+          style="margin-left: 20px;"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <div class="add-form" v-if="upd_bool">
+      <div class="add-form-content">
+        <div class="form-group">
+          <label>Name</label>
+          <select class="browser-default custom-select" v-model="registry.name">
+            <option v-for="(account, index) in accounts" :key="index">
+              {{ account.name }}
+            </option>
+          </select>
+        </div>
+        <label>Type</label>
+        <select
+          class="browser-default custom-select"
+          v-model="registry.type_search"
+        >
+          <option v-for="(type, index) in typelist" :key="index">
+            {{ type.name }}
+          </option>
+        </select>
+        <div>
+          <label>Category</label>
+          <select
+            class="browser-default custom-select"
+            v-model="registry.category"
+            v-if="registry.type_search === 'Income'"
+          >
+            <option v-for="(category, index) in categories.income" :key="index">
+              {{ category.name }}
+            </option>
+          </select>
+          <select
+            class="browser-default custom-select"
+            v-model="registry.category"
+            v-if="registry.type_search === 'Expense'"
+          >
+            <option
+              v-for="(category, index) in categories.expense"
+              :key="index"
+            >
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount</label>
+          <input class="form-control" v-model="registry.amount" />
+        </div>
+        <button class="btn btn-success" @click="updateRegistry(index_upd)">
+          Update
+        </button>
+        <button
+          class="btn btn-danger"
+          style="margin-left: 20px;"
+          @click="
+            upd_bool = false;
+            cleanText();
+          "
+        >
+          Cancel
+        </button>
       </div>
     </div>
 
     <div class="form">
-      <button class="btn btn-primary" @click="add_bool = true">
+      <button class="btn btn-success" @click="add_bool = true">
         Add Transaction
       </button>
       <br />
@@ -70,6 +145,7 @@
             @click="prevUpdate(index)"
           >
             <div class="card-block">
+              <button class="close" @click="delRegistry(index)">&times;</button>
               <div class="card-title">
                 {{ registry.name }}
               </div>
@@ -79,14 +155,11 @@
               <div class="card-subtitle mb-2 text-muted">
                 {{ registry.category }}
               </div>
+              <div class="card-subtitle mb-2 text-muted">{{registry.fecha}}</div>
               <p class="card-text">
                 {{ registry.amount }}
               </p>
             </div>
-            <button class="btn btn-primary" @click="updateRegistry(index)">
-              Update
-            </button>
-            <button class="close" @click="delRegistry(index)">&times;</button>
           </div>
         </div>
       </div>
@@ -103,6 +176,8 @@ export default {
       title: "Registry of transaction",
       total: 0,
       add_bool: false,
+      upd_bool: false,
+      index_upd: 0,
       typelist: [
         {
           name: "Income"
@@ -117,20 +192,40 @@ export default {
         amount: "",
         type_search: "Income"
       },
-      registrys: []
+      account: {
+        accountName: "",
+        name: "",
+        id: ""
+      },
+      registrys: [],
+      accounts: []
     };
   },
   methods: {
     addRegistry: function() {
       let { name, category, amount, type_search } = this.registry;
-      this.registrys.push({
-        name,
-        category,
-        amount,
-        type_search
-      });
-      localStorage.setItem("reg-local", JSON.stringify(this.registrys));
-      this.cleanText();
+      if (
+        this.registry.name === "" ||
+        this.registry.category === "" ||
+        this.registry.amount === "" ||
+        this.registry.type_search === ""
+      ) {
+        alert("You must complete all the fields");
+      } else {
+        if (!isNaN(parseInt(this.registry.amount))) {
+          this.registrys.push({
+            name,
+            category,
+            amount,
+            type_search,
+            fecha: new Date(Date.now()).toLocaleDateString()
+          });
+          localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+          this.add_bool = false;
+          this.cleanText();
+        }
+        else {alert("Amount only allow number value")}
+      }
     },
     delRegistry: function(index) {
       this.registrys.splice(index, 1);
@@ -142,12 +237,20 @@ export default {
       this.registrys[index].type_search = this.registry.type_search;
       this.registrys[index].amount = this.registry.amount;
       localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+      this.upd_bool = false;
+      this.cleanText();
     },
     prevUpdate: function(index) {
-      this.registry.name = this.registrys[index].name;
-      this.registry.category = this.registrys[index].category;
-      this.registry.type_search = this.registrys[index].type_search;
-      this.registry.amount = this.registrys[index].amount;
+      try {
+        this.registry.name = this.registrys[index].name;
+        this.registry.category = this.registrys[index].category;
+        this.registry.type_search = this.registrys[index].type_search;
+        this.registry.amount = this.registrys[index].amount;
+      } catch (error) {
+        console.log("Undefined variable as it's non existent");
+      }
+      this.upd_bool = true;
+      this.index_upd = index;
     },
     cleanText: function() {
       this.registry.name = "";
@@ -159,10 +262,16 @@ export default {
 
   created: function() {
     let registrysDB = JSON.parse(localStorage.getItem("reg-local"));
+    let accountsDB = JSON.parse(localStorage.getItem("reg-Users"));
     if (registrysDB === null) {
       this.registrys = [];
     } else {
       this.registrys = registrysDB;
+    }
+    if (accountsDB === null) {
+      this.accounts = [];
+    } else {
+      this.accounts = accountsDB;
     }
   },
   computed: {
@@ -186,6 +295,7 @@ export default {
 <style>
 .form {
   text-align: left;
+  margin: 30px;
 }
 .card-income {
   background: lightgreen;

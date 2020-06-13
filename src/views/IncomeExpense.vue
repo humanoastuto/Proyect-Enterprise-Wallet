@@ -67,7 +67,11 @@
       <div class="add-form-content">
         <div class="form-group">
           <label>Name</label>
-          <input class="form-control" type="text" v-model="registry.name" />
+          <select class="browser-default custom-select" v-model="registry.name">
+            <option v-for="(account, index) in accounts" :key="index">
+              {{ account.name }}
+            </option>
+          </select>
         </div>
         <label>Type</label>
         <select

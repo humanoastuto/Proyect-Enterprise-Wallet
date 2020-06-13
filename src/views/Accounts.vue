@@ -66,13 +66,13 @@
         >
           <div class="card-sytle" @click="prevUpdate(index)">
             <div>
-              <div class="card-title1">
+              <div class="card-title1 blanco">
                 {{ user.accountName }}
               </div>
-              <div class="card-subtitle mb-2 text-muted">
+              <div class="card-subtitle mb-2 blanco">
                 Usuario: {{ user.name }}
               </div>
-              <div class="card-subtitle mb-2 text-muted">ID: {{ user.id }}</div>
+              <div class="card-subtitle mb-2 blanco">ID: {{ user.id }}</div>
             </div>
             <button class="close" @click="deleteUser(index)">&times;</button>
           </div>
@@ -204,7 +204,7 @@ export default {
   margin: 30px;
 }
 .card-sytle {
-  background: rgb(182, 189, 182);
+  background: #01875a;
   text-align: left;
   border: 1px solid #2c3e50;
   border-radius: 4px;
@@ -230,7 +230,6 @@ export default {
   align-items: center;
   text-align: center;
 }
-
 .add-form-content {
   height: 380px;
   width: 500px;
@@ -238,5 +237,8 @@ export default {
   padding: 20px;
   border-radius: 5px;
   position: relative;
+}
+.blanco {
+  color: white;
 }
 </style>

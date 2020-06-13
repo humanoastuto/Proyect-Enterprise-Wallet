@@ -5,7 +5,6 @@
       <router-link to="/">Home</router-link> |
       <router-link to="/incomeexpense">IncomeExpense</router-link> |
       <router-link to="/transfer">Transfer</router-link> |
-      <router-link to="/register">Register</router-link> |
       <router-link to="/accounts">Accounts</router-link> |
       <router-link to="/categories">Categories</router-link>
     </nav>

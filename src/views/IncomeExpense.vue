@@ -155,6 +155,7 @@
               <div class="card-subtitle mb-2 text-muted">
                 {{ registry.category }}
               </div>
+              <div class="card-subtitle mb-2 text-muted">{{registry.fecha}}</div>
               <p class="card-text">
                 {{ registry.amount }}
               </p>
@@ -211,15 +212,19 @@ export default {
       ) {
         alert("You must complete all the fields");
       } else {
-        this.registrys.push({
-          name,
-          category,
-          amount,
-          type_search
-        });
-        localStorage.setItem("reg-local", JSON.stringify(this.registrys));
-        this.add_bool = false;
-        this.cleanText();
+        if (!isNaN(parseInt(this.registry.amount))) {
+          this.registrys.push({
+            name,
+            category,
+            amount,
+            type_search,
+            fecha: new Date(Date.now()).toLocaleDateString()
+          });
+          localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+          this.add_bool = false;
+          this.cleanText();
+        }
+        else {alert("Amount only allow number value")}
       }
     },
     delRegistry: function(index) {

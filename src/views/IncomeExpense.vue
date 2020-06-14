@@ -131,11 +131,46 @@
         Add Transaction
       </button>
       <br />
-      <label>Total Amount: {{ totalAmount }}</label>
+      <label>Total Amount: {{ totalAmount }} $ </label>
+      <br />
+      <span> Report by: </span>
+      <div class="flex">
+        <select v-model="selectedOption">
+          <option> None </option>
+          <option> Income </option>
+          <option> Expense </option>
+        </select>
+        <select
+          v-model="selectedOptionCategory"
+          :disabled="selectedOption === 'None'"
+          v-if="selectedOption === 'Income'"
+        >
+          <option v-for="(category, index) in categories.income" :key="index">
+            {{ category.name }}
+          </option>
+        </select>
+        <select
+          v-model="selectedOptionCategory"
+          :disabled="selectedOption === 'None'"
+          v-else
+        >
+          <option v-for="(category, index) in categories.expense" :key="index">
+            {{ category.name }}
+          </option>
+        </select>
+        <select v-model="selectedOptionReport">
+          <option value="All"> All </option>
+          <option value="Daily"> Daily </option>
+          <option value="Weekly"> Weekly </option>
+          <option value="Monthly"> Monthly </option>
+          <option value="Yearly"> Yearly </option>
+        </select>
+      </div>
+      <br />
       <div class="col-xs-12">
         <div
           class="col-xs-8 nota"
-          v-for="(registry, index) in registrys"
+          v-for="(registry, index) in sortededregistrys"
           :key="index"
         >
           <div
@@ -155,7 +190,9 @@
               <div class="card-subtitle mb-2 text-muted">
                 {{ registry.category }}
               </div>
-              <div class="card-subtitle mb-2 text-muted">{{registry.fecha}}</div>
+              <div class="card-subtitle mb-2 text-muted">
+                {{ registry.fecha }}
+              </div>
               <p class="card-text">
                 {{ registry.amount }}
               </p>
@@ -175,6 +212,9 @@ export default {
     return {
       title: "Registry of transaction",
       total: 0,
+      selectedOption: "None",
+      selectedOptionCategory: "All",
+      selectedOptionReport: "All",
       add_bool: false,
       upd_bool: false,
       index_upd: 0,
@@ -190,7 +230,8 @@ export default {
         name: "",
         category: "",
         amount: "",
-        type_search: "Income"
+        type_search: "Income",
+        fecha: ""
       },
       account: {
         accountName: "",
@@ -212,7 +253,10 @@ export default {
       ) {
         alert("You must complete all the fields");
       } else {
-        if (!isNaN(parseInt(this.registry.amount))) {
+        if (
+          !isNaN(parseInt(this.registry.amount)) &&
+          parseInt(this.registry.amount) > 0
+        ) {
           this.registrys.push({
             name,
             category,
@@ -223,13 +267,15 @@ export default {
           localStorage.setItem("reg-local", JSON.stringify(this.registrys));
           this.add_bool = false;
           this.cleanText();
+        } else {
+          alert("Amount only allow number value");
         }
-        else {alert("Amount only allow number value")}
       }
     },
     delRegistry: function(index) {
       this.registrys.splice(index, 1);
       localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+      this.upd_bool = false;
     },
     updateRegistry: function(index) {
       this.registrys[index].name = this.registry.name;
@@ -275,6 +321,47 @@ export default {
     }
   },
   computed: {
+    sortededregistrys() {
+      let sortedregistrys =
+        this.selectedOption === "None" ? this.registrys : [];
+      let sortedregistrysparttwo = [];
+      if (this.selectedOption === "Income") {
+        this.registrys.forEach(element => {
+          if (element.type_search === "Income") {
+            sortedregistrys.push(element);
+          }
+        });
+        this.registrys.forEach(element => {
+          if (element.type_search === "Expense") {
+            sortedregistrysparttwo.push(element);
+          }
+        });
+      } else if (this.selectedOption === "Expense") {
+        this.registrys.forEach(element => {
+          if (element.type_search === "Expense") {
+            sortedregistrys.push(element);
+          }
+        });
+        this.registrys.forEach(element => {
+          if (element.type_search === "Income") {
+            sortedregistrys.push(element);
+          }
+        });
+      }
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      sortedregistrys.sort(function(a, b) {
+        var dateA = new Date(a.fecha),
+          dateB = new Date(b.fecha);
+        return dateA - dateB;
+      });
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      sortedregistrysparttwo.sort(function(a, b) {
+        var dateA = new Date(a.fecha),
+          dateB = new Date(b.fecha);
+        return dateA - dateB;
+      });
+      return sortedregistrys.concat(sortedregistrysparttwo);
+    },
     totalAmount() {
       let tamount = 0;
       this.registrys.forEach(function(registry) {

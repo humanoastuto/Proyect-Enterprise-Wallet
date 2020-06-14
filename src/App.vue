@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <nav class="navbar navbar-dark" style="background-color: #4cae4c; padding: 15px;">
+    <nav
+      class="navbar navbar-dark"
+      style="background-color: #4cae4c; padding: 15px;"
+    >
       <span class="navbar-brand mb-0 h1">Virtual Wallet</span>
       <router-link to="/">Home</router-link> |
       <router-link to="/incomeexpense">IncomeExpense</router-link> |

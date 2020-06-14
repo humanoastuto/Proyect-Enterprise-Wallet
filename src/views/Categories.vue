@@ -103,9 +103,7 @@ export default {
       this.selectedType = "";
     },
     created: function() {
-      let categoriesDB = JSON.parse(
-        localStorage.getItem("reg-local-categories")
-      );
+      let categoriesDB = JSON.parse(localStorage.getItem("reg-local-category"));
       if (categoriesDB === null) {
         this.getCategoryList = [];
       } else {

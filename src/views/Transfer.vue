@@ -1,18 +1,21 @@
 <template>
   <div class="transfer" id="app">
     <h3>{{ title }}</h3>
-    <div class="form">
-      <div id="myDIV">
-        <label>Transfer from: </label>
-        <select
-          class="browser-default custom-select"
-          v-model="registry.transferSource"
-        >
-          <option v-for="(account, index) in dropdownListSource" :key="index">
-            {{ account.name }}
-          </option>
-        </select>
-        <label>Transfer to: </label>
+
+    <div class="add-form" v-if="add_bool">
+      <div class="add-form-content">
+        <div class="form-group">
+          <label>Transfer form:</label>
+          <select
+            class="browser-default custom-select"
+            v-model="registry.transferSource"
+          >
+            <option v-for="(account, index) in dropdownListSource" :key="index">
+              {{ account.name }}
+            </option>
+          </select>
+        </div>
+        <label>Transfer to:</label>
         <select
           class="browser-default custom-select"
           v-model="registry.transferDestination"
@@ -24,50 +27,126 @@
             {{ account.name }}
           </option>
         </select>
-        <label>Amount</label>
-        <input class="form-control" v-model="registry.transferAmount" />
-        <button
-          class="btn btn-primary btn-primary-left"
-          @click="transferRegistry()"
-        >
-          Transfer
+        <div class="form-group">
+          <label>Amount</label>
+          <input class="form-control" v-model="registry.transferAmount" />
+        </div>
+        <button class="btn btn-success" @click="transferRegistry()">
+          Confirm
         </button>
-        <button class="btn btn-primary" @click="cleanText">Clean</button>
+        <button
+          class="btn btn-danger"
+          @click="
+            add_bool = false;
+            cleanText();
+          "
+          style="margin-left: 20px;"
+        >
+          Cancel
+        </button>
       </div>
-      <label></label>
+    </div>
+
+    <div class="add-form" v-if="upd_bool">
+      <div class="add-form-content">
+        <div class="form-group">
+          <label>Name</label>
+          <select class="browser-default custom-select" v-model="registry.name">
+            <option v-for="(account, index) in accounts" :key="index">
+              {{ account.name }}
+            </option>
+          </select>
+        </div>
+        <label>Type</label>
+        <select
+          class="browser-default custom-select"
+          v-model="registry.type_search"
+        >
+          <option v-for="(type, index) in typelist" :key="index">
+            {{ type.name }}
+          </option>
+        </select>
+        <div>
+          <label>Category</label>
+          <select
+            class="browser-default custom-select"
+            v-model="registry.category"
+            v-if="registry.type_search === 'Income'"
+          >
+            <option v-for="(category, index) in categories.income" :key="index">
+              {{ category.name }}
+            </option>
+          </select>
+          <select
+            class="browser-default custom-select"
+            v-model="registry.category"
+            v-if="registry.type_search === 'Expense'"
+          >
+            <option
+              v-for="(category, index) in categories.expense"
+              :key="index"
+            >
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount</label>
+          <input class="form-control" v-model="registry.amount" />
+        </div>
+        <button class="btn btn-success" @click="updateRegistry(index_upd)">
+          Update
+        </button>
+        <button
+          class="btn btn-danger"
+          style="margin-left: 20px;"
+          @click="
+            upd_bool = false;
+            cleanText();
+          "
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <div class="form">
+      <button class="btn btn-success" @click="add_bool = true">
+        Make Transfer
+      </button>
       <br />
       <label>Total Amount: {{ totalAmount }}</label>
-    </div>
-    <div class="col-sm-12">
-      <div
-        class="col-sm-8 nota"
-        v-for="(registry, index) in registrys"
-        :key="index"
-      >
+      <div class="col-xs-12">
         <div
-          :class="[
-            registry.type_search === 'Income' ? 'card-income' : 'card-expense'
-          ]"
-          @click="prevUpdate(index)"
+          class="col-xs-8 nota"
+          v-for="(registry, index) in registrys"
+          :key="index"
         >
-          <div class="card-block">
-            <div class="card-title">
-              {{ registry.name }}
+          <div
+            :class="[
+              registry.type_search === 'Income' ? 'card-income' : 'card-expense'
+            ]"
+            @click="prevUpdate(index)"
+          >
+            <div class="card-block">
+              <button class="close" @click="delRegistry(index)">&times;</button>
+              <div class="card-title">
+                {{ registry.name }}
+              </div>
+              <div class="card-subtitle mb-2 text-muted">
+                {{ registry.type_search }}
+              </div>
+              <div class="card-subtitle mb-2 text-muted">
+                {{ registry.category }}
+              </div>
+              <div class="card-subtitle mb-2 text-muted">
+                {{ registry.fecha }}
+              </div>
+              <p class="card-text">
+                {{ registry.amount }}
+              </p>
             </div>
-            <div class="card-subtitle mb-2 text-muted">
-              {{ registry.type_search }}
-            </div>
-            <div class="card-subtitle mb-2 text-muted">
-              {{ registry.category }}
-            </div>
-            <p class="card-text">
-              {{ registry.amount }}
-            </p>
           </div>
-          <button class="btn btn-primary" @click="updateRegistry(index)">
-            Update
-          </button>
-          <button class="close" @click="delRegistry(index)">&times;</button>
         </div>
       </div>
     </div>
@@ -82,6 +161,9 @@ export default {
     return {
       title: "Registry of transaction",
       total: 0,
+      add_bool: false,
+      upd_bool: false,
+      index_upd: 0,
       typelist: [
         {
           name: "Income"
@@ -119,6 +201,8 @@ export default {
       this.registrys[index].type_search = this.registry.type_search;
       this.registrys[index].amount = this.registry.amount;
       localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+      this.upd_bool = false;
+      this.cleanText();
     },
     prevUpdate: function(index) {
       try {
@@ -129,14 +213,9 @@ export default {
       } catch (error) {
         console.log("Undefined variable as it's non existent");
       }
-    },
-    transfershow: function() {
-      var x = document.getElementById("myDIV");
-      if (x.style.display === "none") {
-        x.style.display = "block";
-      } else {
-        x.style.display = "none";
-      }
+
+      this.upd_bool = true;
+      this.index_upd = index;
     },
     transferRegistry: function() {
       if (
@@ -145,6 +224,8 @@ export default {
         this.registry.transferAmount === ""
       ) {
         alert("You must complete all the fields");
+      } else if (this.registry.transferAmount > this.total) {
+        alert("Transfer amount exceeds total");
       } else {
         let name = this.registry.transferSource;
         let category = "Transfer";
@@ -167,6 +248,8 @@ export default {
           type_search
         });
       }
+      this.add_bool = false;
+      this.cleanText();
     },
 
     cleanText: function() {
@@ -221,6 +304,7 @@ export default {
 <style>
 .form {
   text-align: left;
+  margin: 30px;
 }
 .card-income {
   background: lightgreen;
@@ -241,7 +325,25 @@ export default {
 .nota {
   padding: 5px;
 }
-.btn-primary-left {
-  margin-right: 20px;
+
+.add-form {
+  background: rgba(0, 0, 0, 0.6);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.add-form-content {
+  height: 380px;
+  width: 500px;
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  position: relative;
 }
 </style>

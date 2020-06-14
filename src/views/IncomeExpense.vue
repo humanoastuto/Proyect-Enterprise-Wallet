@@ -155,7 +155,9 @@
               <div class="card-subtitle mb-2 text-muted">
                 {{ registry.category }}
               </div>
-              <div class="card-subtitle mb-2 text-muted">{{registry.fecha}}</div>
+              <div class="card-subtitle mb-2 text-muted">
+                {{ registry.fecha }}
+              </div>
               <p class="card-text">
                 {{ registry.amount }}
               </p>

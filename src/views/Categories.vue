@@ -5,7 +5,9 @@
       <div class="add-form-categories-content">
         <div class="form-group">
           <label>Name</label>
-          <input class="form-control" type="text" v-model="c_name" />
+          <div id="category_name">
+            <input class="form-control" type="text" v-model="c_name" />
+          </div>
         </div>
         <label>Type</label>
         <select class="browser-default custom-select" v-model="selectedType">
@@ -27,7 +29,7 @@
         </button>
       </div>
     </div>
-    <div class="form form_categories">
+    <div class=" form_categories">
       <button class="btn btn-success" @click="add_category_bool = true">
         Add Category
       </button>
@@ -42,21 +44,21 @@
             </thead>
             <tbody
               class="green"
-              v-for="(category, item_i) in categories.income"
-              :key="item_i.name"
+              v-for="(category, index) in categories.income"
+              :key="index.name"
             >
               <tr>
-                <td>{{ category.name }}</td>
+                <td class="categoryIncome">{{ category.name }}</td>
                 <td>Income</td>
               </tr>
             </tbody>
             <tbody
               class="red"
-              v-for="(category, item_e) in categories.expense"
-              :key="item_e.name"
+              v-for="(category, item) in categories.expense"
+              :key="item.name"
             >
               <tr>
-                <td>{{ category.name }}</td>
+                <td class="categoryExpense">{{ category.name }}</td>
                 <td>Expense</td>
               </tr>
             </tbody>
@@ -76,11 +78,7 @@ export default {
       c_name: "",
       selectedType: "",
       typelist: [{ name: "Income" }, { name: "Expense" }],
-      add_category_bool: false,
-      category: {
-        income: [{ name: "" }],
-        expense: [{ name: "" }]
-      }
+      add_category_bool: false
     };
   },
   computed: {
@@ -130,7 +128,7 @@ export default {
 <style>
 .form_categories {
   text-align: left;
-  margin: 40pt;
+  margin: 50pt;
 }
 .c_btn {
   margin: 12px;
@@ -158,10 +156,12 @@ h2 {
 }
 
 .green {
+  /*background-color: rgba(10, 126, 10, 0.137);*/
   color: green;
 }
 
 .red {
+  /*background-color: rgba(255, 0, 0, 0.192);*/
   color: red;
 }
 

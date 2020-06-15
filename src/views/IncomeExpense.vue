@@ -28,7 +28,10 @@
             v-model="registry.category"
             v-if="registry.type_search === 'Income'"
           >
-            <option v-for="(category, index) in categories.income" :key="index">
+            <option
+              v-for="(category, index) in category_list.income"
+              :key="index"
+            >
               {{ category.name }}
             </option>
           </select>
@@ -38,7 +41,7 @@
             v-if="registry.type_search === 'Expense'"
           >
             <option
-              v-for="(category, index) in categories.expense"
+              v-for="(category, index) in category_list.expense"
               :key="index"
             >
               {{ category.name }}
@@ -89,7 +92,10 @@
             v-model="registry.category"
             v-if="registry.type_search === 'Income'"
           >
-            <option v-for="(category, index) in categories.income" :key="index">
+            <option
+              v-for="(category, index) in category_list.income"
+              :key="index"
+            >
               {{ category.name }}
             </option>
           </select>
@@ -99,7 +105,7 @@
             v-if="registry.type_search === 'Expense'"
           >
             <option
-              v-for="(category, index) in categories.expense"
+              v-for="(category, index) in category_list.expense"
               :key="index"
             >
               {{ category.name }}
@@ -147,7 +153,10 @@
           :disabled="selectedOption === 'None'"
           v-if="selectedOption === 'Income'"
         >
-          <option v-for="(category, index) in categories.income" :key="index">
+          <option
+            v-for="(category, index) in category_list.income"
+            :key="index"
+          >
             {{ category.name }}
           </option>
         </select>
@@ -156,7 +165,10 @@
           :disabled="selectedOption === 'None'"
           v-else
         >
-          <option v-for="(category, index) in categories.expense" :key="index">
+          <option
+            v-for="(category, index) in category_list.expense"
+            :key="index"
+          >
             {{ category.name }}
           </option>
         </select>
@@ -257,7 +269,6 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
 export default {
   name: "IncomeExpense",
   data() {
@@ -292,7 +303,11 @@ export default {
         id: ""
       },
       registrys: [],
-      accounts: []
+      accounts: [],
+      category_list: {
+        income: [{ name: "Transfer" }, { name: "Other" }],
+        expense: [{ name: "Transfer" }, { name: "Other" }]
+      }
     };
   },
   methods: {
@@ -363,6 +378,8 @@ export default {
   created: function() {
     let registrysDB = JSON.parse(localStorage.getItem("reg-local"));
     let accountsDB = JSON.parse(localStorage.getItem("reg-Users"));
+    let categoriesDB = JSON.parse(localStorage.getItem("reg-local-category"));
+
     if (registrysDB === null) {
       this.registrys = [];
     } else {
@@ -372,6 +389,11 @@ export default {
       this.accounts = [];
     } else {
       this.accounts = accountsDB;
+    }
+    if (categoriesDB === null) {
+      categoriesDB = this.category_list;
+    } else {
+      this.category_list = categoriesDB;
     }
   },
   computed: {
@@ -504,10 +526,6 @@ export default {
         });
       }
       return tamount;
-    },
-    ...mapGetters(["getCategoryList"]),
-    categories: function() {
-      return this.getCategoryList;
     }
   }
 };

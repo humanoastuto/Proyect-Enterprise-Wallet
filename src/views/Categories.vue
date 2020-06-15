@@ -9,13 +9,18 @@
             <input class="form-control" type="text" v-model="c_name" />
           </div>
         </div>
-        <label>Type</label>
-        <select class="browser-default custom-select" v-model="selectedType">
-          <option v-for="(type, index) in typelist" :key="index">
-            {{ type.name }}
-          </option>
-        </select>
-        <button @click="addCategory" class="btn btn-success c_btn ">
+        <div id="c_type">
+          <label>Type</label>
+          <select class="browser-default custom-select" v-model="selectedType">
+            <option v-for="(type, index) in typelist" :key="index">
+              {{ type.name }}
+            </option>
+          </select>
+        </div>
+        <button
+          @click="addCategory({ name: c_name })"
+          class="btn btn-success c_btn "
+        >
           Add
         </button>
         <button
@@ -44,7 +49,7 @@
             </thead>
             <tbody
               class="green"
-              v-for="(category, index) in categories.income"
+              v-for="(category, index) in category_list.income"
               :key="index.name"
             >
               <tr>
@@ -54,7 +59,7 @@
             </tbody>
             <tbody
               class="red"
-              v-for="(category, item) in categories.expense"
+              v-for="(category, item) in category_list.expense"
               :key="item.name"
             >
               <tr>
@@ -70,54 +75,69 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
 export default {
   name: "Categories",
   data() {
     return {
       c_name: "",
       selectedType: "",
+      exists: false,
       typelist: [{ name: "Income" }, { name: "Expense" }],
-      add_category_bool: false
+      add_category_bool: false,
+      category_list: {
+        income: [{ name: "Transfer" }, { name: "Other" }],
+        expense: [{ name: "Transfer" }, { name: "Other" }]
+      }
     };
   },
-  computed: {
-    ...mapGetters(["getCategoryList"]),
-    categories: function() {
-      return this.getCategoryList;
-    }
-  },
+  computed: {},
   methods: {
-    ...mapActions(["addIncomeCategory"]),
-    ...mapActions(["addExpenseCategory"]),
     addCategory: function() {
       if (this.c_name === "" || this.selectedType === "") {
         alert("You must complete all the fields");
+      } else if (this.selectedType === "Expense") {
+        this.category_list.expense.forEach(item_expense => {
+          if (item_expense.name === this.c_name) {
+            this.exists = true;
+          }
+        });
+      } else if (this.selectedType === "Income") {
+        this.category_list.income.forEach(item_income => {
+          if (item_income.name === this.c_name) {
+            this.exists = true;
+          }
+        });
+      }
+      if (this.exists === true) {
+        alert("Category already exists");
       } else {
-        if (this.selectedType === "Income") {
-          this.addIncomeCategory({ name: this.c_name });
-        } else if (this.selectedType === "Expense") {
-          this.addExpenseCategory({ name: this.c_name });
-        }
-        localStorage.setItem(
-          "reg-local-category",
-          JSON.stringify(this.getCategoryList)
-        );
+        this.add({ name: this.c_name }, this.selectedType);
       }
       this.add_category_bool = false;
       this.cancel();
     },
+    add: function(categoryToAdd, selectedType) {
+      if (selectedType === "Expense") {
+        this.category_list.expense.push(categoryToAdd);
+      } else if (selectedType === "Income") {
+        this.category_list.income.push(categoryToAdd);
+      }
+      localStorage.setItem(
+        "reg-local-category",
+        JSON.stringify(this.category_list)
+      );
+    },
     cancel: function() {
       this.c_name = "";
       this.selectedType = "";
-    },
-    created: function() {
-      let categoriesDB = JSON.parse(localStorage.getItem("reg-local-category"));
-      if (categoriesDB === null) {
-        this.getCategoryList = [];
-      } else {
-        this.getCategoryList = categoriesDB;
-      }
+    }
+  },
+  created: function() {
+    let categoriesDB = JSON.parse(localStorage.getItem("reg-local-category"));
+    if (categoriesDB === null) {
+      categoriesDB = this.category_list;
+    } else {
+      this.category_list = categoriesDB;
     }
   }
 };

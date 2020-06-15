@@ -490,16 +490,10 @@ export default {
       sortedregistrysparttwo.sort(comp);
       let cat1 = [];
       let cat2 = [];
-      if (this.selectedOption === "Income") {
-        cat1 = sortedregistrys.filter(
-          item => item.category === this.selectedOptionCategory
-        );
-        cat2 = sortedregistrys.filter(
-          item => item.category !== this.selectedOptionCategory
-        );
-        sortedregistrys = cat1.concat(cat2);
-      } else if (this.selectedOption === "Expense") {
-        console.log(sortedregistrys);
+      if (
+        this.selectedOption === "Income" ||
+        this.selectedOption === "Expense"
+      ) {
         cat1 = sortedregistrys.filter(
           item => item.category === this.selectedOptionCategory
         );

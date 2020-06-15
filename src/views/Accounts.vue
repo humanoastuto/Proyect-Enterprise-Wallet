@@ -91,6 +91,7 @@ export default {
       upd_bool: false,
       user_exists: false,
       isTaken: false,
+      canCreate: true,
       user: {
         accountName: "",
         name: "",
@@ -114,6 +115,7 @@ export default {
         this.user.id === ""
       ) {
         alert("You must complete all the fields");
+        this.canCreate = false;
       } else {
         if (!isNaN(parseInt(this.user.id))) {
           for (let i = 0; i < this.usersList.length; i++) {
@@ -127,12 +129,13 @@ export default {
           }
         } else {
           alert("ID field only accepts numbers");
+          this.canCreate = false;
         }
       }
 
       if (this.isTaken === true) {
         alert("That Account Name is already taken");
-      } else {
+      } else if (this.canCreate === true) {
         const { accountName, name, id } = this.user;
         this.usersList.push({
           accountName,
@@ -142,6 +145,7 @@ export default {
         localStorage.setItem("reg-Users", JSON.stringify(this.usersList));
       }
       this.isTaken = false;
+      this.canCreate = true;
     },
     deleteUser: function(index) {
       for (let i = 0; i < this.registrysList.length; i++) {

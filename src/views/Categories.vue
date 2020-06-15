@@ -1,13 +1,13 @@
 <template>
-  <div>
-    <h1>
-      <u> Categories </u>
-    </h1>
-    <div class="card">
-      <div class="form">
+  <div class="categories">
+    <h2>Categories</h2>
+    <div class="add-form-categories" v-if="add_category_bool">
+      <div class="add-form-categories-content">
         <div class="form-group">
           <label>Name</label>
-          <input class="form-control" type="text" v-model="c_name" />
+          <div id="category_name">
+            <input class="form-control" type="text" v-model="c_name" />
+          </div>
         </div>
         <label>Type</label>
         <select class="browser-default custom-select" v-model="selectedType">
@@ -15,44 +15,57 @@
             {{ type.name }}
           </option>
         </select>
-        <div class="row">
-          <button @click="addCategory" class="c_btn btn_1">
-            Add <span class="glyphicon glyphicon-chevron-left"></span>
-          </button>
-          <button @click="cancel" class="c_btn btn_2">
-            Cancel<span class="glyphicon glyphicon-chevron-right"></span>
-          </button>
+        <button @click="addCategory" class="btn btn-success c_btn ">
+          Add
+        </button>
+        <button
+          @click="
+            add_category_bool = false;
+            cancel();
+          "
+          class="btn btn-danger c_btn "
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+    <div class=" form_categories">
+      <button class="btn btn-success" @click="add_category_bool = true">
+        Add Category
+      </button>
+      <div class="col-xs-12">
+        <div class="col-xs-8 nota">
+          <table class="table table-hover table_p">
+            <thead>
+              <tr class="t_title">
+                <th scope="col">Name</th>
+                <th scope="col">Type</th>
+              </tr>
+            </thead>
+            <tbody
+              class="green"
+              v-for="(category, index) in categories.income"
+              :key="index.name"
+            >
+              <tr>
+                <td class="categoryIncome">{{ category.name }}</td>
+                <td>Income</td>
+              </tr>
+            </tbody>
+            <tbody
+              class="red"
+              v-for="(category, item) in categories.expense"
+              :key="item.name"
+            >
+              <tr>
+                <td class="categoryExpense">{{ category.name }}</td>
+                <td>Expense</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>NAME</th>
-          <th>TYPE</th>
-        </tr>
-      </thead>
-      <tbody
-        class="income-gr"
-        v-for="(category, item_i) in categories.income"
-        :key="item_i.name"
-      >
-        <tr>
-          <td>{{ category.name }}</td>
-          <td>Income</td>
-        </tr>
-      </tbody>
-      <tbody
-        class="expense-gr"
-        v-for="(category, item_e) in categories.expense"
-        :key="item_e.name"
-      >
-        <tr>
-          <td>{{ category.name }}</td>
-          <td>Expense</td>
-        </tr>
-      </tbody>
-    </table>
   </div>
 </template>
 
@@ -64,14 +77,8 @@ export default {
     return {
       c_name: "",
       selectedType: "",
-      typelist: [
-        {
-          name: "Income"
-        },
-        {
-          name: "Expense"
-        }
-      ]
+      typelist: [{ name: "Income" }, { name: "Expense" }],
+      add_category_bool: false
     };
   },
   computed: {
@@ -97,6 +104,8 @@ export default {
           JSON.stringify(this.getCategoryList)
         );
       }
+      this.add_category_bool = false;
+      this.cancel();
     },
     cancel: function() {
       this.c_name = "";
@@ -115,83 +124,61 @@ export default {
 </script>
 
 <style>
-.form {
+.form_categories {
   text-align: left;
-  padding: 30pt;
+  margin: 50pt;
 }
 .c_btn {
-  padding: 10pt;
-  position: relative;
+  margin: 12px;
   margin-top: 40pt;
-  text-align: center;
-  width: 100pt;
-  min-width: 90pt;
-  border-radius: 10pt;
-  cursor: pointer;
-  font-size: 14pt;
-  transition-duration: 0.34s;
-}
-.c_btn:hover {
-  box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24),
-    0 17px 50px 0 rgba(0, 0, 0, 0.16);
-}
-.btn_1 {
-  background-color: antiquewhite;
-  color: black;
-  margin-left: auto;
-  margin-right: auto;
-}
-.btn_2 {
-  background-color: red;
-  color: white;
-  margin-left: auto;
-  margin-right: auto;
 }
 
-h1 {
-  color: black;
-  font-size: 3em;
+h2 {
+  margin-top: 25pt;
+}
+
+.t_title {
+  font-size: 15pt;
+  border-bottom: 3px solid rgb(148, 146, 146);
+  border-top: 2px solid rgb(148, 146, 146);
+}
+
+.table_p {
+  margin-top: 30pt;
+  width: 500pt;
+  border: 2pt;
+  text-align: center;
+  border-right: 4pt solid #000;
+  border-left: 1px solid rgb(148, 146, 146);
+  border-bottom: 3pt solid #000;
+}
+
+.green {
+  /*background-color: rgba(10, 126, 10, 0.137);*/
+  color: green;
+}
+
+.red {
+  /*background-color: rgba(255, 0, 0, 0.192);*/
+  color: red;
+}
+
+.add-form-categories {
+  background: rgba(0, 0, 0, 0.6);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-align: center;
 }
-.card {
-  border: 1px solid #222930;
+.add-form-categories-content {
+  height: 345px;
+  width: 500px;
+  background: white;
+  padding: 40pt;
   border-radius: 6px;
-  max-width: max-content;
-  margin-top: 40pt;
-  margin-right: auto;
-  margin-left: auto;
-  min-width: 400pt;
-}
-.expense-gr {
-  background-color: rgb(245, 209, 216);
-}
-.income-gr {
-  background-color: rgb(220, 233, 220);
-}
-
-.table {
-  padding: 30pt;
-  margin-top: 50pt;
-  margin-left: auto;
-  margin-right: auto;
-  width: 450pt;
-  border: 2px solid black;
-}
-.table tbody tr:nth-child(2n) td {
-  background: rgb(255, 255, 255);
-}
-.table td {
-  text-align: center;
-  padding: 10px;
-  border: 2px solid black;
-}
-.table th {
-  text-transform: uppercase;
-  text-align: center;
-  color: white;
-  padding: 10px;
-  min-width: 35px;
-  max-width: 140px;
-  background: black;
 }
 </style>

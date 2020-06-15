@@ -5,10 +5,6 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    obj: {
-      incomes: [],
-      expenses: []
-    },
     categories: {
       income: [{ name: "Transfer" }, { name: "Other" }],
       expense: [{ name: "Transfer" }, { name: "Other" }]

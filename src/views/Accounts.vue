@@ -123,9 +123,6 @@ export default {
               this.usersList[i].id === this.user.id
             ) {
               this.isTaken = true;
-              console.log(this.usersList[i].accountName);
-              console.log(this.user.accountName);
-              console.log(this.isTaken);
             }
           }
         } else {

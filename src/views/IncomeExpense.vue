@@ -133,7 +133,7 @@
       <br />
       <label>Total Amount: {{ totalAmount }} $ </label>
       <br />
-      <span> Report by: </span>
+      <span> Sort by (First to appear in the Report): </span>
       <div class="flex">
         <select v-model="selectedOption">
           <option> None </option>
@@ -262,7 +262,8 @@ export default {
             category,
             amount,
             type_search,
-            fecha: new Date(Date.now()).toLocaleDateString()
+            //fecha: new Date(Date.now()).toLocaleDateString()
+            fecha: new Date(Date.now()).toString()
           });
           localStorage.setItem("reg-local", JSON.stringify(this.registrys));
           this.add_bool = false;
@@ -273,8 +274,9 @@ export default {
       }
     },
     delRegistry: function(index) {
-      this.registrys.splice(index, 1);
-      localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+      this.sortededregistrys.splice(index, 1);
+      localStorage.setItem("reg-local", JSON.stringify(this.sortededregistrys));
+      this.registrys = this.sortededregistrys;
       this.upd_bool = false;
     },
     updateRegistry: function(index) {
@@ -348,18 +350,13 @@ export default {
           }
         });
       }
-      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      sortedregistrys.sort(function(a, b) {
-        var dateA = new Date(a.fecha),
-          dateB = new Date(b.fecha);
-        return dateA - dateB;
-      });
-      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      sortedregistrysparttwo.sort(function(a, b) {
-        var dateA = new Date(a.fecha),
-          dateB = new Date(b.fecha);
-        return dateA - dateB;
-      });
+      function comp(a, b) {
+        return new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
+      }
+
+      sortedregistrys.sort(comp);
+      sortedregistrysparttwo.sort(comp);
+
       return sortedregistrys.concat(sortedregistrysparttwo);
     },
     totalAmount() {

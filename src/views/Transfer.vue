@@ -224,8 +224,9 @@ export default {
         this.registry.transferAmount === ""
       ) {
         alert("You must complete all the fields");
-      } else if (this.registry.transferAmount > this.total) {
+      } else if (this.registry.transferAmount > this.tamount) {
         alert("Transfer amount exceeds total");
+        console.log("TOTAL: " +  this.tamount);
       } else {
         let name = this.registry.transferSource;
         let category = "Transfer";
@@ -247,9 +248,11 @@ export default {
           amount,
           type_search
         });
+        localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+        this.add_bool = false;
+        this.cleanText();
       }
-      this.add_bool = false;
-      this.cleanText();
+     
     },
 
     cleanText: function() {

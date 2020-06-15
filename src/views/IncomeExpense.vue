@@ -131,11 +131,57 @@
         Add Transaction
       </button>
       <br />
-      <label>Total Amount: {{ totalAmount }}</label>
-      <div class="col-xs-12">
+      <label>Total Amount: {{ totalAmount }} $ </label>
+      <br />
+      <span>
+        Sort by (First to appear in the Report, already sorted by date):
+      </span>
+      <div class="flex">
+        <select v-model="selectedOption">
+          <option> None </option>
+          <option> Income </option>
+          <option> Expense </option>
+        </select>
+        <select
+          v-model="selectedOptionCategory"
+          :disabled="selectedOption === 'None'"
+          v-if="selectedOption === 'Income'"
+        >
+          <option v-for="(category, index) in categories.income" :key="index">
+            {{ category.name }}
+          </option>
+        </select>
+        <select
+          v-model="selectedOptionCategory"
+          :disabled="selectedOption === 'None'"
+          v-else
+        >
+          <option v-for="(category, index) in categories.expense" :key="index">
+            {{ category.name }}
+          </option>
+        </select>
+        <select v-model="selectedOptionReport">
+          <option value="All"> All </option>
+          <option value="Daily"> Daily </option>
+          <option value="Weekly"> Weekly </option>
+          <option value="Monthly"> Monthly </option>
+          <option value="Yearly"> Yearly </option>
+        </select>
+        <span> Since </span>
+        <input
+          v-model="rangestart"
+          :disabled="selectedOptionReport === 'All'"
+          placeholder="Indique la fecha de Inicio"
+        />
+      </div>
+      <span v-if="selectedOptionReport !== 'All'">
+        Can't Delete while Report Daily, Weekly, Monthly, Yearly
+      </span>
+      <br />
+      <div class="col-xs-12" v-if="selectedOptionReport !== 'All'">
         <div
           class="col-xs-8 nota"
-          v-for="(registry, index) in registrys"
+          v-for="(registry, index) in reportedregistrys"
           :key="index"
         >
           <div
@@ -145,7 +191,48 @@
             @click="prevUpdate(index)"
           >
             <div class="card-block">
-              <button class="close" @click="delRegistry(index)">&times;</button>
+              <button
+                v-if="selectedOptionReport === 'All'"
+                class="close"
+                @click="delRegistry(index)"
+              >
+                &times;
+              </button>
+              <div class="card-title">
+                {{ registry.name }}
+              </div>
+              <div class="card-subtitle mb-2 text-muted">
+                {{ registry.type_search }}
+              </div>
+              <div class="card-subtitle mb-2 text-muted">
+                {{ registry.category }}
+              </div>
+              <div class="card-subtitle mb-2 text-muted">
+                {{ registry.fecha }}
+              </div>
+              <p class="card-text">
+                {{ registry.amount }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12" v-else>
+        <div
+          class="col-xs-8 nota"
+          v-for="(registry, index) in sortededregistrys"
+          :key="index"
+        >
+          <div
+            :class="[
+              registry.type_search === 'Income' ? 'card-income' : 'card-expense'
+            ]"
+            @click="prevUpdate(index)"
+          >
+            <div class="card-block">
+              <button class="close" @click="delRegistry(index)">
+                &times;
+              </button>
               <div class="card-title">
                 {{ registry.name }}
               </div>
@@ -177,9 +264,13 @@ export default {
     return {
       title: "Registry of transaction",
       total: 0,
+      selectedOption: "None",
+      selectedOptionCategory: "All",
+      selectedOptionReport: "All",
       add_bool: false,
       upd_bool: false,
       index_upd: 0,
+      rangestart: new Date(Date.now()).toLocaleDateString(),
       typelist: [
         {
           name: "Income"
@@ -192,7 +283,8 @@ export default {
         name: "",
         category: "",
         amount: "",
-        type_search: "Income"
+        type_search: "Income",
+        fecha: ""
       },
       account: {
         accountName: "",
@@ -214,24 +306,31 @@ export default {
       ) {
         alert("You must complete all the fields");
       } else {
-        if (!isNaN(parseInt(this.registry.amount))) {
+        if (
+          !isNaN(parseInt(this.registry.amount)) &&
+          parseInt(this.registry.amount) > 0
+        ) {
           this.registrys.push({
             name,
             category,
             amount,
             type_search,
             fecha: new Date(Date.now()).toLocaleDateString()
+            //fecha: new Date(Date.now()).toString()
           });
           localStorage.setItem("reg-local", JSON.stringify(this.registrys));
           this.add_bool = false;
           this.cleanText();
+        } else {
+          alert("Amount only allow number value");
         }
-        else {alert("Amount only allow number value")}
       }
     },
     delRegistry: function(index) {
-      this.registrys.splice(index, 1);
-      localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+      this.sortededregistrys.splice(index, 1);
+      localStorage.setItem("reg-local", JSON.stringify(this.sortededregistrys));
+      this.registrys = this.sortededregistrys;
+      this.upd_bool = false;
     },
     updateRegistry: function(index) {
       this.registrys[index].name = this.registry.name;
@@ -261,7 +360,6 @@ export default {
       this.registry.amount = "";
     }
   },
-
   created: function() {
     let registrysDB = JSON.parse(localStorage.getItem("reg-local"));
     let accountsDB = JSON.parse(localStorage.getItem("reg-Users"));
@@ -277,13 +375,134 @@ export default {
     }
   },
   computed: {
+    rangeend() {
+      let fechasplit = this.rangestart.split("/");
+      let rangeend;
+      if (this.selectedOptionReport == "All") {
+        rangeend = new Date(+fechasplit[2], fechasplit[1] - 1, +fechasplit[0]);
+      } else if (this.selectedOptionReport == "Daily") {
+        rangeend = new Date(
+          +fechasplit[2],
+          fechasplit[1] - 1,
+          +fechasplit[0] + 1
+        );
+      } else if (this.selectedOptionReport == "Weekly") {
+        rangeend = new Date(
+          +fechasplit[2],
+          fechasplit[1] - 1,
+          +fechasplit[0] + 7
+        );
+      } else if (this.selectedOptionReport == "Monthly") {
+        rangeend = new Date(+fechasplit[2], fechasplit[1], +fechasplit[0]);
+      } else if (this.selectedOptionReport == "Yearly") {
+        rangeend = new Date(
+          +fechasplit[2] + 1,
+          fechasplit[1] - 1,
+          +fechasplit[0]
+        );
+      }
+      return rangeend.toLocaleDateString();
+    },
+    reportedregistrys() {
+      let fechastartsplit = this.rangestart.split("/");
+      let fechaendsplit = this.rangeend.split("/");
+      let fechastart = new Date(
+        +fechastartsplit[2],
+        fechastartsplit[1] - 1,
+        +fechastartsplit[0]
+      );
+      let fechaend = new Date(
+        +fechaendsplit[2],
+        fechaendsplit[1] - 1,
+        +fechaendsplit[0]
+      );
+      let rangedregistrys = [];
+      this.sortededregistrys.forEach(element => {
+        let fechasplit = element.fecha.split("/");
+        let fechain = new Date(
+          +fechasplit[2],
+          fechasplit[1] - 1,
+          +fechasplit[0]
+        );
+        if (
+          fechain.getTime() <= fechaend.getTime() &&
+          fechain.getTime() >= fechastart.getTime()
+        ) {
+          rangedregistrys.push(element);
+        }
+      });
+      return rangedregistrys;
+    },
+    sortededregistrys() {
+      let sortedregistrys =
+        this.selectedOption === "None" ? this.registrys : [];
+      sortedregistrys.sort(comp);
+      let sortedregistrysparttwo = [];
+      if (this.selectedOption === "Income") {
+        this.registrys.forEach(element => {
+          if (element.type_search === "Income") {
+            sortedregistrys.push(element);
+          }
+        });
+        this.registrys.forEach(element => {
+          if (element.type_search === "Expense") {
+            sortedregistrysparttwo.push(element);
+          }
+        });
+      } else if (this.selectedOption === "Expense") {
+        this.registrys.forEach(element => {
+          if (element.type_search === "Expense") {
+            sortedregistrys.push(element);
+          }
+        });
+        this.registrys.forEach(element => {
+          if (element.type_search === "Income") {
+            sortedregistrysparttwo.push(element);
+          }
+        });
+      }
+      function comp(a, b) {
+        return new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
+      }
+      sortedregistrys.sort(comp);
+      sortedregistrysparttwo.sort(comp);
+      let cat1 = [];
+      let cat2 = [];
+      if (this.selectedOption === "Income") {
+        cat1 = sortedregistrys.filter(
+          item => item.category === this.selectedOptionCategory
+        );
+        cat2 = sortedregistrys.filter(
+          item => item.category !== this.selectedOptionCategory
+        );
+        sortedregistrys = cat1.concat(cat2);
+      } else if (this.selectedOption === "Expense") {
+        console.log(sortedregistrys);
+        cat1 = sortedregistrys.filter(
+          item => item.category === this.selectedOptionCategory
+        );
+        cat2 = sortedregistrys.filter(
+          item => item.category !== this.selectedOptionCategory
+        );
+        sortedregistrys = cat1.concat(cat2);
+      }
+      return sortedregistrys.concat(sortedregistrysparttwo);
+    },
     totalAmount() {
       let tamount = 0;
-      this.registrys.forEach(function(registry) {
-        registry.type_search === "Income"
-          ? (tamount += parseInt(registry.amount))
-          : (tamount -= parseInt(registry.amount));
-      });
+      if (this.selectedOptionReport === "All") {
+        this.registrys.forEach(function(registry) {
+          registry.type_search === "Income"
+            ? (tamount += parseInt(registry.amount))
+            : (tamount -= parseInt(registry.amount));
+        });
+      } else {
+        this.reportedregistrys.forEach(function(registry) {
+          registry.type_search === "Income"
+            ? (tamount += parseInt(registry.amount))
+            : (tamount -= parseInt(registry.amount));
+        });
+      }
       return tamount;
     },
     ...mapGetters(["getCategoryList"]),

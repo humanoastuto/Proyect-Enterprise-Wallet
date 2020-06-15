@@ -117,7 +117,11 @@ export default {
       } else {
         if (!isNaN(parseInt(this.user.id))) {
           for (let i = 0; i < this.usersList.length; i++) {
-            if (this.usersList[i].accountName === this.user.accountName) {
+            if (
+              this.usersList[i].accountName === this.user.accountName ||
+              this.usersList[i].name === this.user.name ||
+              this.usersList[i].id === this.user.id
+            ) {
               this.isTaken = true;
             }
           }
@@ -128,7 +132,6 @@ export default {
 
       if (this.isTaken === true) {
         alert("That Account Name is already taken");
-        this.isTaken = false;
       } else {
         const { accountName, name, id } = this.user;
         this.usersList.push({
@@ -138,6 +141,7 @@ export default {
         });
         localStorage.setItem("reg-Users", JSON.stringify(this.usersList));
       }
+      this.isTaken = false;
     },
     deleteUser: function(index) {
       for (let i = 0; i < this.registrysList.length; i++) {

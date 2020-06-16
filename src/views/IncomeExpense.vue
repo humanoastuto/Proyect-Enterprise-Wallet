@@ -111,16 +111,6 @@
         </button>
       </div>
     </div>
-
-
-
-
-
-
-
-
-
-
     <div class="add-form" v-if="upd_bool">
       <div class="add-form-content">
         <div class="form-group">
@@ -351,6 +341,7 @@ export default {
       upd_bool: false,
       transfer_bool: false,
       index_upd: 0,
+
       rangestart: new Date(Date.now()).toLocaleDateString(),
       typelist: [
         {
@@ -365,7 +356,10 @@ export default {
         category: "",
         amount: "",
         type_search: "Income",
-        fecha: ""
+        fecha: "",
+        transferSource: "",
+        transferDestination: "",
+        transferAmount: ""
       },
       account: {
         accountName: "",
@@ -391,9 +385,14 @@ export default {
         this.registry.type_search === ""
       ) {
         alert("You must complete all the fields");
+      } else if (
+        this.registry.type_search === "Expense" &&
+        this.registry.amount > this.findbalance
+      ) {
+        alert("Not enough balance in account for expense");
       } else {
         if (
-          !isNaN(parseInt(this.registry.amount)) &&
+          !isNaN(this.registry.amount) &&
           parseInt(this.registry.amount) > 0
         ) {
           this.registrys.push({
@@ -418,12 +417,31 @@ export default {
       this.upd_bool = false;
     },
     updateRegistry: function(index) {
+      if (
+        this.registry.amount < this.findbalance &&
+        this.registry.type_search === "Expense"
+      ) {
+      this.registrys[index].name = this.registry.name;
+      this.registrys[index].category = this.registry.category;
+        this.registrys[index].type_search = this.registry.type_search;
+      this.registrys[index].amount = this.registry.amount;
+      localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+      this.upd_bool = false;
+      } else if (
+        this.findbalance - this.registry.amount <= 0 &&
+        this.registry.type_search === "Income"
+      ) {
       this.registrys[index].name = this.registry.name;
       this.registrys[index].category = this.registry.category;
       this.registrys[index].type_search = this.registry.type_search;
       this.registrys[index].amount = this.registry.amount;
       localStorage.setItem("reg-local", JSON.stringify(this.registrys));
       this.upd_bool = false;
+      }
+      else {
+        alert("Cant update this");
+      }
+      
     },
     prevUpdate: function(index) {
       try {
@@ -449,21 +467,19 @@ export default {
       this.registry.transferAmount = "";
     },
     transferRegistry: function() {
-      console.log("TOTAL: " + this.totalAmount);
+      console.log("TOTAL: " + this.findbalance);
       if (
         this.registry.transferSource === "" ||
         this.registry.transferDestination === "" ||
         this.registry.transferAmount === ""
       ) {
         alert("You must complete all the fields");
-      } else if (
-        this.registry.transferAmount >
-       
-        this.accounts.filter(
-          account => account.accountName === this.registry.transferSource
-        ).balance
-      ) {
-        alert("Transfer amount exceeds total");
+      } else if (this.registry.transferAmount > this.findbalance) {
+        alert("Transfer amount exceeds total: " + this.findbalance);
+      } else if (this.registry.transferAmount <= "0") {
+        alert("Can't transfer nothing");
+      } else if (isNaN(this.registry.transferAmount)) {
+        alert("Value must me number");
       } else {
         let name = this.registry.transferSource;
         let category = "Transfer";
@@ -671,12 +687,17 @@ export default {
         item => item.accountName !== this.registry.transferDestination
       );
     },
-    findbalance(){
+    findbalance() {
+      let value = 0;
       this.accounts.forEach(element => {
-        if(element.accountName === this.registry.
-        
-        ountNA)
+        if (
+          element.accountName === this.registry.transferSource ||
+          element.accountName === this.registry.name
+        ) {
+          value = element.balance;
+        }
       });
+      return value;
     }
   }
 };

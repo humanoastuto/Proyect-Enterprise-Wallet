@@ -2,7 +2,7 @@
   <div class="incomeexpense" id="app">
     <h3>{{ title }}</h3>
 
-    <div class="add-form" v-if="add_bool">
+   <div class="add-form" v-if="add_bool">
       <div class="add-form-content">
         <div class="form-group">
           <label>Name</label>
@@ -65,6 +65,61 @@
         </button>
       </div>
     </div>
+ 
+
+    <div class="add-form" v-if="transfer_bool">
+      <div class="add-form-content">
+        <div class="form-group">
+          <label>Transfer form:</label>
+          <select
+            class="browser-default custom-select"
+            v-model="registry.transferSource"
+          >
+            <option v-for="(account, index) in dropdownListSource" :key="index">
+              {{ account.accountName }}
+            </option>
+          </select>
+        </div>
+        <label>Transfer to:</label>
+        <select
+          class="browser-default custom-select"
+          v-model="registry.transferDestination"
+        >
+          <option
+            v-for="(account, index) in dropdownListDestination"
+            :key="index"
+          >
+            {{ account.accountName }}
+          </option>
+        </select>
+        <div class="form-group">
+          <label>Amount</label>
+          <input class="form-control" v-model="registry.transferAmount" />
+        </div>
+        <button class="btn btn-success" @click="transferRegistry()">
+          Confirm
+        </button>
+        <button
+          class="btn btn-danger"
+          @click="
+            transfer_bool = false;
+            cleanTextTransfer();
+          "
+          style="margin-left: 20px;"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+
+
+
+
+
+
+
+
+
 
     <div class="add-form" v-if="upd_bool">
       <div class="add-form-content">
@@ -132,6 +187,7 @@
       </div>
     </div>
 
+
     <div class="form">
       <button
         class="btn btn-success"
@@ -141,6 +197,16 @@
         "
       >
         Add Transaction
+      </button>
+      <p />
+       <button
+        class="btn btn-success"
+        @click="
+          transfer_bool = true;
+          cleanTextTransfer();
+        "
+      >
+        Make Transfer
       </button>
       <br />
       <label>Total Amount: {{ totalAmount }} $ </label>
@@ -283,6 +349,7 @@ export default {
       selectedOptionReport: "All",
       add_bool: false,
       upd_bool: false,
+      transfer_bool: false,
       index_upd: 0,
       rangestart: new Date(Date.now()).toLocaleDateString(),
       typelist: [
@@ -375,6 +442,55 @@ export default {
       this.registry.category = "";
       this.registry.type_search = "Income";
       this.registry.amount = "";
+    },
+    cleanTextTransfer: function() {
+      this.registry.transferSource = "";
+      this.registry.transferDestination = "";
+      this.registry.transferAmount = "";
+    },
+    transferRegistry: function() {
+      console.log("TOTAL: " + this.totalAmount);
+      if (
+        this.registry.transferSource === "" ||
+        this.registry.transferDestination === "" ||
+        this.registry.transferAmount === ""
+      ) {
+        alert("You must complete all the fields");
+      } else if (
+        this.registry.transferAmount >
+       
+        this.accounts.filter(
+          account => account.accountName === this.registry.transferSource
+        ).balance
+      ) {
+        alert("Transfer amount exceeds total");
+      } else {
+        let name = this.registry.transferSource;
+        let category = "Transfer";
+        let amount = this.registry.transferAmount;
+        let type_search = "Expense";
+        this.registrys.push({
+          name,
+          category,
+          amount,
+          type_search,
+          fecha: new Date(Date.now()).toLocaleDateString()
+        });
+        name = this.registry.transferDestination;
+        category = "Transfer";
+        amount = this.registry.transferAmount;
+        type_search = "Income";
+        this.registrys.push({
+          name,
+          category,
+          amount,
+          type_search,
+          fecha: new Date(Date.now()).toLocaleDateString()
+        });
+        localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+        this.transfer_bool = false;
+        this.cleanTextTransfer();
+      }
     }
   },
   created: function() {
@@ -544,6 +660,23 @@ export default {
         });
       });
       return 0;
+    },
+    dropdownListDestination() {
+      return this.accounts.filter(
+        item => item.accountName !== this.registry.transferSource
+      );
+    },
+    dropdownListSource() {
+      return this.accounts.filter(
+        item => item.accountName !== this.registry.transferDestination
+      );
+    },
+    findbalance(){
+      this.accounts.forEach(element => {
+        if(element.accountName === this.registry.
+        
+        ountNA)
+      });
     }
   }
 };

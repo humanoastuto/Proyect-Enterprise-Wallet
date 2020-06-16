@@ -32,7 +32,7 @@
     </div>
 
     <div class="add-form" v-if="upd_bool">
-      <div class="add-form-content">
+      <div class="upd-form-content">
         <div class="form-group">
           <label>New Account Name:</label>
           <input class="form-control" v-model="user.accountName" />
@@ -249,6 +249,15 @@ export default {
   border-radius: 5px;
   position: relative;
 }
+.upd-form-content {
+  height: 150px;
+  width: 500px;
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  position: relative;
+}
+
 .blanco {
   color: white;
 }

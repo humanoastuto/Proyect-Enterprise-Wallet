@@ -8,7 +8,7 @@
           <label>Name</label>
           <select class="browser-default custom-select" v-model="registry.name">
             <option v-for="(account, index) in accounts" :key="index">
-              {{ account.name }}
+              {{ account.accountName }}
             </option>
           </select>
         </div>
@@ -72,7 +72,7 @@
           <label>Name</label>
           <select class="browser-default custom-select" v-model="registry.name">
             <option v-for="(account, index) in accounts" :key="index">
-              {{ account.name }}
+              {{ account.accountName }}
             </option>
           </select>
         </div>
@@ -133,24 +133,25 @@
     </div>
 
     <div class="form">
-      <button class="btn btn-success" @click="add_bool = true">
+      <button class="btn btn-success" @click="add_bool = true; cleanText();">
         Add Transaction
       </button>
       <br />
       <label>Total Amount: {{ totalAmount }} $ </label>
+      <label>Total Balance: {{ fieldBalances }} $ </label>
       <br />
       <span>
         Sort by (First to appear in the Report, already sorted by date):
       </span>
       <div class="flex">
-        <select v-model="selectedOption">
+        <select class="browser-default custom-select" v-model="selectedOption">
           <option> None </option>
           <option> Income </option>
           <option> Expense </option>
         </select>
         <select
+          class="browser-default custom-select"
           v-model="selectedOptionCategory"
-          :disabled="selectedOption === 'None'"
           v-if="selectedOption === 'Income'"
         >
           <option
@@ -161,9 +162,9 @@
           </option>
         </select>
         <select
+          class="browser-default custom-select"
           v-model="selectedOptionCategory"
-          :disabled="selectedOption === 'None'"
-          v-else
+          v-if="selectedOption === 'Expense'"
         >
           <option
             v-for="(category, index) in category_list.expense"
@@ -172,15 +173,19 @@
             {{ category.name }}
           </option>
         </select>
-        <select v-model="selectedOptionReport">
-          <option value="All"> All </option>
+        <select
+          class="browser-default custom-select"
+          v-model="selectedOptionReport"
+        >
+          <option value="All"> Without </option>
           <option value="Daily"> Daily </option>
           <option value="Weekly"> Weekly </option>
           <option value="Monthly"> Monthly </option>
           <option value="Yearly"> Yearly </option>
         </select>
-        <span> Since </span>
+        <span> Since: </span>
         <input
+          class="form-control"
           v-model="rangestart"
           :disabled="selectedOptionReport === 'All'"
           placeholder="Indique la fecha de Inicio"
@@ -210,21 +215,17 @@
               >
                 &times;
               </button>
-              <div class="card-title">
-                {{ registry.name }}
+              <div class="card-title">Account: {{ registry.name }}</div>
+              <div class="card-subtitle mb-2 text-muted">
+                Type: {{ registry.type_search }}
               </div>
               <div class="card-subtitle mb-2 text-muted">
-                {{ registry.type_search }}
+                Category: {{ registry.category }}
               </div>
               <div class="card-subtitle mb-2 text-muted">
-                {{ registry.category }}
+                Date: {{ registry.fecha }}
               </div>
-              <div class="card-subtitle mb-2 text-muted">
-                {{ registry.fecha }}
-              </div>
-              <p class="card-text">
-                {{ registry.amount }}
-              </p>
+              <p class="card-text">Amount: {{ registry.amount }}</p>
             </div>
           </div>
         </div>
@@ -245,21 +246,17 @@
               <button class="close" @click.stop="delRegistry(index)">
                 &times;
               </button>
-              <div class="card-title">
-                {{ registry.name }}
+              <div class="card-title">Account: {{ registry.name }}</div>
+              <div class="card-subtitle mb-2 text-muted">
+                Type: {{ registry.type_search }}
               </div>
               <div class="card-subtitle mb-2 text-muted">
-                {{ registry.type_search }}
+                Category: {{ registry.category }}
               </div>
               <div class="card-subtitle mb-2 text-muted">
-                {{ registry.category }}
+                Date: {{ registry.fecha }}
               </div>
-              <div class="card-subtitle mb-2 text-muted">
-                {{ registry.fecha }}
-              </div>
-              <p class="card-text">
-                {{ registry.amount }}
-              </p>
+              <p class="card-text">Amount: {{ registry.amount }}</p>
             </div>
           </div>
         </div>
@@ -300,7 +297,8 @@ export default {
       account: {
         accountName: "",
         name: "",
-        id: ""
+        id: "",
+        balance: 0
       },
       registrys: [],
       accounts: [],
@@ -335,7 +333,6 @@ export default {
           });
           localStorage.setItem("reg-local", JSON.stringify(this.registrys));
           this.add_bool = false;
-          this.cleanText();
         } else {
           alert("Amount only allow number value");
         }
@@ -354,7 +351,6 @@ export default {
       this.registrys[index].amount = this.registry.amount;
       localStorage.setItem("reg-local", JSON.stringify(this.registrys));
       this.upd_bool = false;
-      this.cleanText();
     },
     prevUpdate: function(index) {
       try {
@@ -426,34 +422,39 @@ export default {
       return rangeend.toLocaleDateString();
     },
     reportedregistrys() {
-      let fechastartsplit = this.rangestart.split("/");
-      let fechaendsplit = this.rangeend.split("/");
-      let fechastart = new Date(
-        +fechastartsplit[2],
-        fechastartsplit[1] - 1,
-        +fechastartsplit[0]
-      );
-      let fechaend = new Date(
-        +fechaendsplit[2],
-        fechaendsplit[1] - 1,
-        +fechaendsplit[0]
-      );
-      let rangedregistrys = [];
-      this.sortededregistrys.forEach(element => {
-        let fechasplit = element.fecha.split("/");
-        let fechain = new Date(
-          +fechasplit[2],
-          fechasplit[1] - 1,
-          +fechasplit[0]
+      try {
+        let fechastartsplit = this.rangestart.split("/");
+        let fechaendsplit = this.rangeend.split("/");
+        let fechastart = new Date(
+          +fechastartsplit[2],
+          fechastartsplit[1] - 1,
+          +fechastartsplit[0]
         );
-        if (
-          fechain.getTime() <= fechaend.getTime() &&
-          fechain.getTime() >= fechastart.getTime()
-        ) {
-          rangedregistrys.push(element);
-        }
-      });
-      return rangedregistrys;
+        let fechaend = new Date(
+          +fechaendsplit[2],
+          fechaendsplit[1] - 1,
+          +fechaendsplit[0]
+        );
+        let rangedregistrys = [];
+        this.sortededregistrys.forEach(element => {
+          let fechasplit = element.fecha.split("/");
+          let fechain = new Date(
+            +fechasplit[2],
+            fechasplit[1] - 1,
+            +fechasplit[0]
+          );
+          if (
+            fechain.getTime() <= fechaend.getTime() &&
+            fechain.getTime() >= fechastart.getTime()
+          ) {
+            rangedregistrys.push(element);
+          }
+        });
+        return rangedregistrys;
+      } catch (error) {
+        alert("Theres an issue with some date in the report");
+      }
+      return -1;
     },
     sortededregistrys() {
       let sortedregistrys =
@@ -520,6 +521,23 @@ export default {
         });
       }
       return tamount;
+    },
+    fieldBalances() {
+      const acc = this.accounts;
+      acc.forEach(function(accobj) {
+        accobj.balance = 0;
+      })
+      this.registrys.forEach(function(registry) {
+        acc.forEach(function(account) {
+          if (registry.name === account.accountName) {
+            registry.type_search === "Income"
+              ? (account.balance += parseInt(registry.amount))
+              : (account.balance -= parseInt(registry.amount));
+            localStorage.setItem("reg-Users", JSON.stringify(acc));
+          }
+        });
+      });
+      return 0;
     }
   }
 };
@@ -554,7 +572,7 @@ export default {
   background: rgba(0, 0, 0, 0.6);
   width: 100%;
   height: 100%;
-  position: absolute;
+  position: fixed;
   top: 0;
   display: flex;
   justify-content: center;

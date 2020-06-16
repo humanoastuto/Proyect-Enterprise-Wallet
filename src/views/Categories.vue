@@ -161,6 +161,9 @@ h2 {
   font-size: 15pt;
   border-bottom: 3px solid rgb(148, 146, 146);
   border-top: 2px solid rgb(148, 146, 146);
+  background: rgb(76, 174, 76);
+  color: white;
+
 }
 
 .table_p {
@@ -171,6 +174,8 @@ h2 {
   border-right: 4pt solid #000;
   border-left: 1px solid rgb(148, 146, 146);
   border-bottom: 3pt solid #000;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .green {

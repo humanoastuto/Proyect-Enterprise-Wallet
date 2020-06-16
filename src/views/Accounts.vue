@@ -17,7 +17,7 @@
           <label>User ID:</label>
           <input class="form-control" type="text" v-model="user.id" />
         </div>
-        <button class="btn btn-primary" @click="addUser">Register</button>
+        <button class="btn btn-success" @click="addUser">Register</button>
         <button
           class="btn btn-danger"
           @click="
@@ -32,7 +32,7 @@
     </div>
 
     <div class="add-form" v-if="upd_bool">
-      <div class="add-form-content">
+      <div class="upd-form-content">
         <div class="form-group">
           <label>New Account Name:</label>
           <input class="form-control" v-model="user.accountName" />
@@ -53,8 +53,14 @@
       </div>
     </div>
 
-    <div class="Form">
-      <button class="btn btn-success prueba" @click="add_bool = true">
+    <div class="form">
+      <button
+        class="btn btn-success"
+        @click="
+          add_bool = true;
+          cleanText();
+        "
+      >
         Register
       </button>
       <br />
@@ -66,13 +72,16 @@
         >
           <div class="card-sytle" @click="prevUpdate(index)">
             <div>
-              <div class="card-title1 blanco">
-                {{ user.accountName }}
+              <div class="card-title blanco" style="margin-top: 10px">
+                Account Name: {{ user.accountName }}
               </div>
               <div class="card-subtitle mb-2 blanco">
                 Usuario: {{ user.name }}
               </div>
               <div class="card-subtitle mb-2 blanco">ID: {{ user.id }}</div>
+              <div class="card-subtitle mb-2 blanco">
+                Balance: {{ user.balance }} $
+              </div>
             </div>
             <button class="close" @click.stop="deleteUser(index)">&times;</button>
           </div>
@@ -119,11 +128,7 @@ export default {
       } else {
         if (!isNaN(parseInt(this.user.id))) {
           for (let i = 0; i < this.usersList.length; i++) {
-            if (
-              this.usersList[i].accountName === this.user.accountName ||
-              this.usersList[i].name === this.user.name ||
-              this.usersList[i].id === this.user.id
-            ) {
+            if (this.usersList[i].accountName === this.user.accountName) {
               this.isTaken = true;
             }
           }
@@ -140,9 +145,11 @@ export default {
         this.usersList.push({
           accountName,
           name,
-          id
+          id,
+          balance: 0
         });
         localStorage.setItem("reg-Users", JSON.stringify(this.usersList));
+        this.add_bool = false;
       }
       this.isTaken = false;
       this.canCreate = true;
@@ -154,7 +161,7 @@ export default {
         }
       }
       if (this.user_exists === true) {
-        alert("You can't delte this user");
+        alert("You can't delete this user");
         this.user_exists = false;
       } else {
         this.usersList.splice(index, 1);
@@ -212,7 +219,7 @@ export default {
   margin: 30px;
 }
 .card-sytle {
-  background: #01875a;
+  background: #3195a7;
   text-align: left;
   border: 1px solid #2c3e50;
   border-radius: 4px;
@@ -224,14 +231,14 @@ export default {
   padding: 5px;
 }
 .card-title1 {
-  text-align: center;
+  text-align: left;
   padding: 5px;
 }
 .add-form {
   background: rgba(0, 0, 0, 0.6);
   width: 100%;
   height: 100%;
-  position: absolute;
+  position: fixed;
   top: 0;
   display: flex;
   justify-content: center;
@@ -246,6 +253,15 @@ export default {
   border-radius: 5px;
   position: relative;
 }
+.upd-form-content {
+  height: 150px;
+  width: 500px;
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  position: relative;
+}
+
 .blanco {
   color: white;
 }

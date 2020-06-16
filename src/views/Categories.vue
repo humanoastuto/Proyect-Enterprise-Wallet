@@ -45,6 +45,7 @@
               <tr class="t_title">
                 <th scope="col">Name</th>
                 <th scope="col">Type</th>
+                <th></th>
               </tr>
             </thead>
             <tbody
@@ -55,6 +56,17 @@
               <tr>
                 <td class="categoryIncome">{{ category.name }}</td>
                 <td>Income</td>
+                <td>
+                  <button
+                    class="close"
+                    @click.stop="deleteCategory(category.name, 'Income')"
+                    v-if="
+                      category.name !== 'Transfer' && category.name !== 'Other'
+                    "
+                  >
+                    &times;
+                  </button>
+                </td>
               </tr>
             </tbody>
             <tbody
@@ -65,6 +77,17 @@
               <tr>
                 <td class="categoryExpense">{{ category.name }}</td>
                 <td>Expense</td>
+                <td>
+                  <button
+                    class="close"
+                    @click.stop="deleteCategory(category.name, 'Expense')"
+                    v-if="
+                      category.name !== 'Transfer' && category.name !== 'Other'
+                    "
+                  >
+                    &times;
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -95,13 +118,22 @@ export default {
     addCategory: function() {
       if (this.c_name === "" || this.selectedType === "") {
         alert("You must complete all the fields");
-      } else if (this.selectedType === "Expense") {
+      } else {
+        let category = { name: this.c_name };
+        let type = this.selectedType;
+        this.add(category, type);
+      }
+      this.add_category_bool = false;
+      this.cancel();
+    },
+    add: function(categoryToAdd, selectedType) {
+      if (selectedType === "Expense") {
         this.category_list.expense.forEach(item_expense => {
           if (item_expense.name === this.c_name) {
             this.exists = true;
           }
         });
-      } else if (this.selectedType === "Income") {
+      } else if (selectedType === "Income") {
         this.category_list.income.forEach(item_income => {
           if (item_income.name === this.c_name) {
             this.exists = true;
@@ -111,25 +143,35 @@ export default {
       if (this.exists === true) {
         alert("Category already exists");
       } else {
-        this.add({ name: this.c_name }, this.selectedType);
+        if (selectedType === "Expense") {
+          this.category_list.expense.push(categoryToAdd);
+        } else if (selectedType === "Income") {
+          this.category_list.income.push(categoryToAdd);
+        }
+        localStorage.setItem(
+          "reg-local-category",
+          JSON.stringify(this.category_list)
+        );
       }
-      this.add_category_bool = false;
-      this.cancel();
     },
-    add: function(categoryToAdd, selectedType) {
-      if (selectedType === "Expense") {
-        this.category_list.expense.push(categoryToAdd);
-      } else if (selectedType === "Income") {
-        this.category_list.income.push(categoryToAdd);
+    cancel: function() {
+      this.c_name = "";
+      this.selectedType = "";
+    },
+    deleteCategory: function(category, type) {
+      if (type === "Expense") {
+        this.category_list.expense = this.category_list.expense.filter(
+          ct => ct.name !== category
+        );
+      } else if (type === "Income") {
+        this.category_list.income = this.category_list.income.filter(
+          ct => ct.name !== category
+        );
       }
       localStorage.setItem(
         "reg-local-category",
         JSON.stringify(this.category_list)
       );
-    },
-    cancel: function() {
-      this.c_name = "";
-      this.selectedType = "";
     }
   },
   created: function() {
@@ -163,12 +205,11 @@ h2 {
   border-top: 2px solid rgb(148, 146, 146);
   background: rgb(76, 174, 76);
   color: white;
-
 }
 
 .table_p {
   margin-top: 30pt;
-  width: 500pt;
+  width: 550pt;
   border: 2pt;
   text-align: center;
   border-right: 4pt solid #000;
@@ -179,12 +220,10 @@ h2 {
 }
 
 .green {
-  /*background-color: rgba(10, 126, 10, 0.137);*/
   color: green;
 }
 
 .red {
-  /*background-color: rgba(255, 0, 0, 0.192);*/
   color: red;
 }
 
@@ -192,7 +231,7 @@ h2 {
   background: rgba(0, 0, 0, 0.6);
   width: 100%;
   height: 100%;
-  position: absolute;
+  position: fixed;
   top: 0;
   display: flex;
   justify-content: center;

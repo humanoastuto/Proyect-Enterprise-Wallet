@@ -254,7 +254,6 @@ export default {
         this.add_bool = false;
         this.cleanText();
       }
-     
     },
 
     cleanText: function() {

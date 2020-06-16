@@ -26,8 +26,12 @@ function storageMock() {
     }
   };
 }
-describe("Category List ", () => {
+describe("Categories ", () => {
   let localVue;
+
+  global.alert = function(msg) {
+    console.log(msg);
+  };
 
   beforeEach(() => {
     global.localStorage = storageMock();
@@ -35,7 +39,7 @@ describe("Category List ", () => {
     localVue = createLocalVue();
   });
 
-  it("The LocalStorage category list is the same as the category data list and is not empty", () => {
+  it("The LocalStorage category list is the same as the category data list and is not empty.", () => {
     const wrapper = mount(Categories, {
       store,
       localVue
@@ -52,7 +56,7 @@ describe("Category List ", () => {
     //console.log(categories);
   });
 
-  it("The Logic to insert income category should works correctly", () => {
+  it("The Logic to insert income category should works correctly.", () => {
     const wrapper = mount(Categories, {
       store,
       localVue
@@ -71,7 +75,7 @@ describe("Category List ", () => {
     //console.log(global.localStorage.getItem("reg-local-category"));
   });
 
-  it("The Logic to insert expense category should works correctly", () => {
+  it("The Logic to insert expense category should works correctly.", () => {
     const wrapper = mount(Categories, {
       store,
       localVue
@@ -90,29 +94,16 @@ describe("Category List ", () => {
     //console.log(global.localStorage.getItem("reg-local-category"));
   });
 
-  /*
-  it("The income category list contains at least two items.", () => {
-    global.localStorage = storageMock();
-
-    const localVue = createLocalVue();
-
+  it("The income and expense lists in categories contain at least two elements each.", () => {
     const wrapper = mount(Categories, {
       store,
       localVue
     });
 
-    let incomes = wrapper.findAll(".categoryIncome");
-    assert.isTrue(wrapper.exists());
-    assert.isAtLeast(incomes.length, 2); //>=
+    const income_list = wrapper.vm.$data.category_list.income;
+    assert.isAtLeast(income_list.length, 2); //>=
+
+    const expense_list = wrapper.vm.$data.category_list.expense;
+    assert.isAtLeast(expense_list.length, 2);
   });
-
-  it("The expense category list contains at least two items.", () => {
-    const wrapper = mount(Categories, {
-      store,
-      localVue
-    });
-    let expense = wrapper.findAll(".categoryExpense");
-    assert.isTrue(wrapper.exists());
-    assert.isAtLeast(expense.length, 2); //>=
-  });*/
 });

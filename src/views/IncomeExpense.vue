@@ -133,7 +133,13 @@
     </div>
 
     <div class="form">
-      <button class="btn btn-success" @click="add_bool = true; cleanText();">
+      <button
+        class="btn btn-success"
+        @click="
+          add_bool = true;
+          cleanText();
+        "
+      >
         Add Transaction
       </button>
       <br />
@@ -526,7 +532,7 @@ export default {
       const acc = this.accounts;
       acc.forEach(function(accobj) {
         accobj.balance = 0;
-      })
+      });
       this.registrys.forEach(function(registry) {
         acc.forEach(function(account) {
           if (registry.name === account.accountName) {

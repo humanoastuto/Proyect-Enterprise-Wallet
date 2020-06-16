@@ -72,7 +72,9 @@
         >
           <div class="card-sytle" @click="prevUpdate(index)">
             <div>
-              <button class="close" @click.stop="deleteUser(index)">&times;</button>
+              <button class="close" @click.stop="deleteUser(index)">
+                &times;
+              </button>
               <div class="card-title blanco" style="margin-top: 10px">
                 Account Name: {{ user.accountName }}
               </div>

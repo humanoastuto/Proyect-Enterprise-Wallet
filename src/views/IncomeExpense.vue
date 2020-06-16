@@ -242,7 +242,7 @@
             @click="prevUpdate(index)"
           >
             <div class="card-block">
-              <button class="close" @click="delRegistry(index)">
+              <button class="close" @click.stop="delRegistry(index)">
                 &times;
               </button>
               <div class="card-title">

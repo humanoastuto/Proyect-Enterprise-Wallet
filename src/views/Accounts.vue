@@ -74,7 +74,7 @@
               </div>
               <div class="card-subtitle mb-2 blanco">ID: {{ user.id }}</div>
             </div>
-            <button class="close" @click="deleteUser(index)">&times;</button>
+            <button class="close" @click.stop="deleteUser(index)">&times;</button>
           </div>
         </div>
       </div>

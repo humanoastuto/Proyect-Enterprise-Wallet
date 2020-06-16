@@ -11,7 +11,7 @@
             v-model="registry.transferSource"
           >
             <option v-for="(account, index) in dropdownListSource" :key="index">
-              {{ account.name }}
+              {{ account.accountName }}
             </option>
           </select>
         </div>
@@ -24,7 +24,7 @@
             v-for="(account, index) in dropdownListDestination"
             :key="index"
           >
-            {{ account.name }}
+            {{ account.accountName }}
           </option>
         </select>
         <div class="form-group">
@@ -53,7 +53,7 @@
           <label>Name</label>
           <select class="browser-default custom-select" v-model="registry.name">
             <option v-for="(account, index) in accounts" :key="index">
-              {{ account.name }}
+              {{ account.accountName }}
             </option>
           </select>
         </div>

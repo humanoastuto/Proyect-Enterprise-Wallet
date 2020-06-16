@@ -143,14 +143,14 @@
         Sort by (First to appear in the Report, already sorted by date):
       </span>
       <div class="flex">
-        <select v-model="selectedOption">
+        <select class="browser-default custom-select" v-model="selectedOption">
           <option> None </option>
           <option> Income </option>
           <option> Expense </option>
         </select>
         <select
+          class="browser-default custom-select"
           v-model="selectedOptionCategory"
-          :disabled="selectedOption === 'None'"
           v-if="selectedOption === 'Income'"
         >
           <option
@@ -161,9 +161,9 @@
           </option>
         </select>
         <select
+          class="browser-default custom-select"
           v-model="selectedOptionCategory"
-          :disabled="selectedOption === 'None'"
-          v-else
+          v-if="selectedOption === 'Expense'"
         >
           <option
             v-for="(category, index) in category_list.expense"
@@ -172,15 +172,19 @@
             {{ category.name }}
           </option>
         </select>
-        <select v-model="selectedOptionReport">
-          <option value="All"> All </option>
+        <select
+          class="browser-default custom-select"
+          v-model="selectedOptionReport"
+        >
+          <option value="All"> Without </option>
           <option value="Daily"> Daily </option>
           <option value="Weekly"> Weekly </option>
           <option value="Monthly"> Monthly </option>
           <option value="Yearly"> Yearly </option>
         </select>
-        <span> Since </span>
+        <span> Since: </span>
         <input
+          class="form-control"
           v-model="rangestart"
           :disabled="selectedOptionReport === 'All'"
           placeholder="Indique la fecha de Inicio"
@@ -210,21 +214,17 @@
               >
                 &times;
               </button>
-              <div class="card-title">
-                {{ registry.name }}
+              <div class="card-title">Account: {{ registry.name }}</div>
+              <div class="card-subtitle mb-2 text-muted">
+                Type: {{ registry.type_search }}
               </div>
               <div class="card-subtitle mb-2 text-muted">
-                {{ registry.type_search }}
+                Category: {{ registry.category }}
               </div>
               <div class="card-subtitle mb-2 text-muted">
-                {{ registry.category }}
+                Date: {{ registry.fecha }}
               </div>
-              <div class="card-subtitle mb-2 text-muted">
-                {{ registry.fecha }}
-              </div>
-              <p class="card-text">
-                {{ registry.amount }}
-              </p>
+              <p class="card-text">Amount: {{ registry.amount }}</p>
             </div>
           </div>
         </div>
@@ -245,21 +245,17 @@
               <button class="close" @click.stop="delRegistry(index)">
                 &times;
               </button>
-              <div class="card-title">
-                {{ registry.name }}
+              <div class="card-title">Account: {{ registry.name }}</div>
+              <div class="card-subtitle mb-2 text-muted">
+                Type: {{ registry.type_search }}
               </div>
               <div class="card-subtitle mb-2 text-muted">
-                {{ registry.type_search }}
+                Category: {{ registry.category }}
               </div>
               <div class="card-subtitle mb-2 text-muted">
-                {{ registry.category }}
+                Date: {{ registry.fecha }}
               </div>
-              <div class="card-subtitle mb-2 text-muted">
-                {{ registry.fecha }}
-              </div>
-              <p class="card-text">
-                {{ registry.amount }}
-              </p>
+              <p class="card-text">Amount: {{ registry.amount }}</p>
             </div>
           </div>
         </div>
@@ -426,34 +422,39 @@ export default {
       return rangeend.toLocaleDateString();
     },
     reportedregistrys() {
-      let fechastartsplit = this.rangestart.split("/");
-      let fechaendsplit = this.rangeend.split("/");
-      let fechastart = new Date(
-        +fechastartsplit[2],
-        fechastartsplit[1] - 1,
-        +fechastartsplit[0]
-      );
-      let fechaend = new Date(
-        +fechaendsplit[2],
-        fechaendsplit[1] - 1,
-        +fechaendsplit[0]
-      );
-      let rangedregistrys = [];
-      this.sortededregistrys.forEach(element => {
-        let fechasplit = element.fecha.split("/");
-        let fechain = new Date(
-          +fechasplit[2],
-          fechasplit[1] - 1,
-          +fechasplit[0]
+      try {
+        let fechastartsplit = this.rangestart.split("/");
+        let fechaendsplit = this.rangeend.split("/");
+        let fechastart = new Date(
+          +fechastartsplit[2],
+          fechastartsplit[1] - 1,
+          +fechastartsplit[0]
         );
-        if (
-          fechain.getTime() <= fechaend.getTime() &&
-          fechain.getTime() >= fechastart.getTime()
-        ) {
-          rangedregistrys.push(element);
-        }
-      });
-      return rangedregistrys;
+        let fechaend = new Date(
+          +fechaendsplit[2],
+          fechaendsplit[1] - 1,
+          +fechaendsplit[0]
+        );
+        let rangedregistrys = [];
+        this.sortededregistrys.forEach(element => {
+          let fechasplit = element.fecha.split("/");
+          let fechain = new Date(
+            +fechasplit[2],
+            fechasplit[1] - 1,
+            +fechasplit[0]
+          );
+          if (
+            fechain.getTime() <= fechaend.getTime() &&
+            fechain.getTime() >= fechastart.getTime()
+          ) {
+            rangedregistrys.push(element);
+          }
+        });
+        return rangedregistrys;
+      } catch (error) {
+        alert("Theres an issue with some date in the report");
+      }
+      return -1;
     },
     sortededregistrys() {
       let sortedregistrys =

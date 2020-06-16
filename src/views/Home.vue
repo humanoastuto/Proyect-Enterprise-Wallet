@@ -1,6 +1,10 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/icon-bank.png" style="margin-top: 20px;"/>
+    <img
+      alt="Vue logo"
+      src="../assets/icon-bank.png"
+      style="margin-top: 20px;"
+    />
     <HelloWorld msg="Welcome to Your Wallet App" />
   </div>
 </template>

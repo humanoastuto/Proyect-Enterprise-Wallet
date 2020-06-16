@@ -41,7 +41,7 @@ describe("Accounts Management", () => {
     localVue = createLocalVue();
   });
 
-  it("New account succesfully added", () => {
+  it("Adding a new account to local storage", () => {
     const wrapper = mount(Accounts, {
       store,
       localVue
@@ -53,20 +53,17 @@ describe("Accounts Management", () => {
       id: 1234567
     };
     wrapper.vm.$data.user = accountToAdd;
-    /*wrapper.vm.$data.user.accountName = "Unit Test";
-    wrapper.vm.$data.user.name = "Testing";
-    wrapper.vm.$data.user.id = 1234567;*/
     wrapper.vm.addUser();
-    console.log(
+    /*console.log(
       "Probando:" + JSON.stringify(global.localStorage.getItem("reg-Users"))
-    );
+    );*/
     const [accountFound] = JSON.parse(
       global.localStorage.getItem("reg-Users")
     ).filter(an => an.accountName === "Unit Test");
     assert.equal(accountFound.accountName, accountToAdd.accountName);
   });
 
-  it("Account succesfully added and deleted", () => {
+  it("Add a new account and delete it from the local storage", () => {
     const wrapper = mount(Accounts, {
       store,
       localVue
@@ -86,5 +83,32 @@ describe("Accounts Management", () => {
       .length;
 
     assert.equal(lengthExpected, lengthRecieved);
+  });
+
+  it("Update the accountName from one account", () => {
+    const wrapper = mount(Accounts, {
+      store,
+      localVue
+    });
+    const accountToAdd1 = {
+      accountName: "Unit Test - Update",
+      name: "Testing",
+      id: 1234567
+    };
+    const nameToUpdate = "Updated Correctly";
+
+    wrapper.vm.$data.user = accountToAdd1;
+    wrapper.vm.addUser();
+    wrapper.vm.$data.user.accountName = nameToUpdate;
+    wrapper.vm.updateUser(0);
+    /*console.log(
+      "Probando Update:" +
+        JSON.stringify(global.localStorage.getItem("reg-Users"))
+    );*/
+    const [accountUpdated] = JSON.parse(
+      global.localStorage.getItem("reg-Users")
+    );
+
+    assert.equal(accountUpdated.accountName, nameToUpdate);
   });
 });

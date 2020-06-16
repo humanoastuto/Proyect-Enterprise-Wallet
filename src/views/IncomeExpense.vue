@@ -133,7 +133,7 @@
     </div>
 
     <div class="form">
-      <button class="btn btn-success" @click="add_bool = true">
+      <button class="btn btn-success" @click="add_bool = true; cleanText();">
         Add Transaction
       </button>
       <br />
@@ -331,7 +331,6 @@ export default {
           });
           localStorage.setItem("reg-local", JSON.stringify(this.registrys));
           this.add_bool = false;
-          this.cleanText();
         } else {
           alert("Amount only allow number value");
         }
@@ -350,7 +349,6 @@ export default {
       this.registrys[index].amount = this.registry.amount;
       localStorage.setItem("reg-local", JSON.stringify(this.registrys));
       this.upd_bool = false;
-      this.cleanText();
     },
     prevUpdate: function(index) {
       try {

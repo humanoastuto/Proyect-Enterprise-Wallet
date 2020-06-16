@@ -169,25 +169,31 @@ export default {
       this.user_exists = false;
     },
     updateUser: function(index) {
-      for (let i = 0; i < this.usersList.length; i++) {
-        if (this.usersList[i].accountName === this.user.accountName) {
-          this.isTaken = true;
-        }
-      }
-      for (let i = 0; i < this.registrysList.length; i++) {
-        if (this.registrysList[i].name === this.usersList[index].accountName) {
-          this.user_exists = true;
-        }
-      }
-      if (this.isTaken === true) {
-        alert("That Account Name is already taken");
-      } else if (this.user_exists === false) {
-        this.usersList[index].accountName = this.user.accountName;
-        localStorage.setItem("reg-Users", JSON.stringify(this.usersList));
-        this.upd_bool = false;
-        this.cleanText();
+      if (this.user.accountName === "") {
+        alert("You have to write something");
       } else {
-        alert("Cannot update this account");
+        for (let i = 0; i < this.usersList.length; i++) {
+          if (this.usersList[i].accountName === this.user.accountName) {
+            this.isTaken = true;
+          }
+        }
+        for (let i = 0; i < this.registrysList.length; i++) {
+          if (
+            this.registrysList[i].name === this.usersList[index].accountName
+          ) {
+            this.user_exists = true;
+          }
+        }
+        if (this.isTaken === true) {
+          alert("That Account Name is already taken");
+        } else if (this.user_exists === false) {
+          this.usersList[index].accountName = this.user.accountName;
+          localStorage.setItem("reg-Users", JSON.stringify(this.usersList));
+          this.upd_bool = false;
+          this.cleanText();
+        } else {
+          alert("Cannot update this account");
+        }
       }
       this.isTaken = false;
       this.user_exists = false;

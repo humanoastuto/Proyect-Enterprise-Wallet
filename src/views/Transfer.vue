@@ -226,7 +226,7 @@ export default {
         alert("You must complete all the fields");
       } else if (this.registry.transferAmount > this.tamount) {
         alert("Transfer amount exceeds total");
-        console.log("TOTAL: " +  this.tamount);
+        console.log("TOTAL: " + this.tamount);
       } else {
         let name = this.registry.transferSource;
         let category = "Transfer";
@@ -236,7 +236,8 @@ export default {
           name,
           category,
           amount,
-          type_search
+          type_search,
+          fecha: new Date(Date.now()).toLocaleDateString()
         });
         name = this.registry.transferDestination;
         category = "Transfer";
@@ -246,7 +247,8 @@ export default {
           name,
           category,
           amount,
-          type_search
+          type_search,
+          fecha: new Date(Date.now()).toLocaleDateString()
         });
         localStorage.setItem("reg-local", JSON.stringify(this.registrys));
         this.add_bool = false;

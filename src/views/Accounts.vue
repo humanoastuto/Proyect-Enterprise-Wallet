@@ -79,6 +79,9 @@
                 Usuario: {{ user.name }}
               </div>
               <div class="card-subtitle mb-2 blanco">ID: {{ user.id }}</div>
+              <div class="card-subtitle mb-2 blanco">
+                Balance: {{ user.balance }} $
+              </div>
             </div>
             <button class="close" @click.stop="deleteUser(index)">&times;</button>
           </div>
@@ -142,7 +145,8 @@ export default {
         this.usersList.push({
           accountName,
           name,
-          id
+          id,
+          balance: 0
         });
         localStorage.setItem("reg-Users", JSON.stringify(this.usersList));
         this.add_bool = false;

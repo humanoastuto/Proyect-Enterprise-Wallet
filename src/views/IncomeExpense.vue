@@ -8,7 +8,7 @@
           <label>Name</label>
           <select class="browser-default custom-select" v-model="registry.name">
             <option v-for="(account, index) in accounts" :key="index">
-              {{ account.name }}
+              {{ account.accountName }}
             </option>
           </select>
         </div>
@@ -72,7 +72,7 @@
           <label>Name</label>
           <select class="browser-default custom-select" v-model="registry.name">
             <option v-for="(account, index) in accounts" :key="index">
-              {{ account.name }}
+              {{ account.accountName }}
             </option>
           </select>
         </div>
@@ -138,6 +138,7 @@
       </button>
       <br />
       <label>Total Amount: {{ totalAmount }} $ </label>
+      <label>Total Balance: {{ fieldBalances }} $ </label>
       <br />
       <span>
         Sort by (First to appear in the Report, already sorted by date):
@@ -296,7 +297,8 @@ export default {
       account: {
         accountName: "",
         name: "",
-        id: ""
+        id: "",
+        balance: 0
       },
       registrys: [],
       accounts: [],
@@ -519,6 +521,23 @@ export default {
         });
       }
       return tamount;
+    },
+    fieldBalances() {
+      const acc = this.accounts;
+      acc.forEach(function(accobj) {
+        accobj.balance = 0;
+      })
+      this.registrys.forEach(function(registry) {
+        acc.forEach(function(account) {
+          if (registry.name === account.accountName) {
+            registry.type_search === "Income"
+              ? (account.balance += parseInt(registry.amount))
+              : (account.balance -= parseInt(registry.amount));
+            localStorage.setItem("reg-Users", JSON.stringify(acc));
+          }
+        });
+      });
+      return 0;
     }
   }
 };

@@ -5,24 +5,23 @@ import IncomeExpense from "@/views/IncomeExpense.vue";
 import Transfer from "@/views/Transfer.vue";
 import store from "@/store";
 
-
 function storageMock() {
   let storage = {};
 
   return {
-    setItem: function (key, value) {
-      storage[key] = value || '';
+    setItem: function(key, value) {
+      storage[key] = value || "";
     },
-    getItem: function (key) {
+    getItem: function(key) {
       return key in storage ? storage[key] : null;
     },
-    removeItem: function (key) {
+    removeItem: function(key) {
       delete storage[key];
     },
     get length() {
       return Object.keys(storage).length;
     },
-    key: function (i) {
+    key: function(i) {
       const keys = Object.keys(storage);
       return keys[i] || null;
     }
@@ -65,11 +64,9 @@ describe("Income.vue", () => {
 });
 describe("Transfer.vue", () => {
   it("Create transfer and make sure the Income is made to destination and Expense to source", () => {
-
     global.localStorage = storageMock();
     const localVue = createLocalVue();
     const wrapper = shallowMount(Transfer, { store, localVue });
-
 
     wrapper.vm.$data.registry.transferSource = "Salary";
     wrapper.vm.$data.registry.transferDestination = "Savings";

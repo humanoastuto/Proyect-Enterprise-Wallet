@@ -54,7 +54,13 @@
     </div>
 
     <div class="form">
-      <button class="btn btn-success" @click="add_bool = true">
+      <button
+        class="btn btn-success"
+        @click="
+          add_bool = true;
+          cleanText();
+        "
+      >
         Register
       </button>
       <br />
@@ -139,6 +145,7 @@ export default {
           id
         });
         localStorage.setItem("reg-Users", JSON.stringify(this.usersList));
+        this.add_bool = false;
       }
       this.isTaken = false;
       this.canCreate = true;
@@ -150,7 +157,7 @@ export default {
         }
       }
       if (this.user_exists === true) {
-        alert("You can't delte this user");
+        alert("You can't delete this user");
         this.user_exists = false;
       } else {
         this.usersList.splice(index, 1);
@@ -227,7 +234,7 @@ export default {
   background: rgba(0, 0, 0, 0.6);
   width: 100%;
   height: 100%;
-  position: absolute;
+  position: fixed;
   top: 0;
   display: flex;
   justify-content: center;

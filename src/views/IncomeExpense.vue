@@ -553,7 +553,7 @@ export default {
   background: rgba(0, 0, 0, 0.6);
   width: 100%;
   height: 100%;
-  position: absolute;
+  position: fixed;
   top: 0;
   display: flex;
   justify-content: center;

@@ -72,6 +72,7 @@
         >
           <div class="card-sytle" @click="prevUpdate(index)">
             <div>
+              <button class="close" @click.stop="deleteUser(index)">&times;</button>
               <div class="card-title blanco" style="margin-top: 10px">
                 Account Name: {{ user.accountName }}
               </div>
@@ -83,7 +84,6 @@
                 Balance: {{ user.balance }} $
               </div>
             </div>
-            <button class="close" @click.stop="deleteUser(index)">&times;</button>
           </div>
         </div>
       </div>
@@ -156,17 +156,17 @@ export default {
     },
     deleteUser: function(index) {
       for (let i = 0; i < this.registrysList.length; i++) {
-        if (this.registrysList[i].name === this.usersList[index].name) {
+        if (this.registrysList[i].name === this.usersList[index].accountName) {
           this.user_exists = true;
         }
       }
       if (this.user_exists === true) {
         alert("You can't delete this user");
-        this.user_exists = false;
       } else {
         this.usersList.splice(index, 1);
         localStorage.setItem("reg-Users", JSON.stringify(this.usersList));
       }
+      this.user_exists = false;
     },
     updateUser: function(index) {
       for (let i = 0; i < this.usersList.length; i++) {
@@ -174,16 +174,23 @@ export default {
           this.isTaken = true;
         }
       }
-
+      for (let i = 0; i < this.registrysList.length; i++) {
+        if (this.registrysList[i].name === this.usersList[index].accountName) {
+          this.user_exists = true;
+        }
+      }
       if (this.isTaken === true) {
         alert("That Account Name is already taken");
-        this.isTaken = false;
-      } else {
+      } else if (this.user_exists === false) {
         this.usersList[index].accountName = this.user.accountName;
         localStorage.setItem("reg-Users", JSON.stringify(this.usersList));
         this.upd_bool = false;
         this.cleanText();
+      } else {
+        alert("Cannot update this account");
       }
+      this.isTaken = false;
+      this.user_exists = false;
     },
     prevUpdate: function(index) {
       this.upd_bool = true;

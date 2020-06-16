@@ -138,7 +138,7 @@
       </button>
       <br />
       <label>Total Amount: {{ totalAmount }} $ </label>
-      <label>Total Balance: {{ fieldBalances }} $ </label>
+      <label style="color: white;">Total Balance: {{ fieldBalances }} $ </label>
       <br />
       <span>
         Sort by (First to appear in the Report, already sorted by date):

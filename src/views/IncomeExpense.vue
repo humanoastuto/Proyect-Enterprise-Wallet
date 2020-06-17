@@ -688,6 +688,10 @@ export default {
       );
     },
     findbalance() {
+      console.log("Cuentas disponibles" + JSON.stringify(this.accounts));
+       console.log("Transferencias" + this.registry.transferSource);
+       console.log("Nombre registro" + this.registry.name);
+
       let value = 0;
       this.accounts.forEach(element => {
         if (

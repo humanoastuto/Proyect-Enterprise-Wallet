@@ -60,27 +60,22 @@ describe("Transfer.vue", () => {
       store,
       localVue
     });
-
-    const accountToAdd = {
+    console.log(wrapper.html());
+    const accountSource = {
       accountName: "Unit Test",
       name: "Testing",
       id: 1234567
     };
-    const accountToAdd2 = {
+    const accountDestination = {
       accountName: "Test Unit",
       name: "Testing1",
       id: 123490
     };
-    wrapper.vm.$data.user = accountToAdd;
+    wrapper.vm.$data.user = accountSource;
     wrapper.vm.addUser();
-    console.log(
-      "Usuario 1: " + JSON.stringify(global.localStorage.getItem("reg-Users"))
-    );
-    wrapper.vm.$data.user = accountToAdd2;
+
+    wrapper.vm.$data.user = accountDestination;
     wrapper.vm.addUser();
-    console.log(
-      "Usuarios: " + JSON.stringify(global.localStorage.getItem("reg-Users"))
-    );
 
     const registryToAdd = {
       name: "Unit Test",
@@ -91,46 +86,40 @@ describe("Transfer.vue", () => {
     };
     wrapper.vm.$data.registry = registryToAdd;
     wrapper.vm.addRegistry();
-    let accountmodified = JSON.parse(
-      global.localStorage.getItem("reg-Users")
-    );
+    let accountmodified = JSON.parse(global.localStorage.getItem("reg-Users"));
     accountmodified[0].balance = 1000;
 
     global.localStorage.setItem("reg-Users", JSON.stringify(accountmodified));
-    console.log(
-      "UsuariosMOD: " + JSON.stringify(global.localStorage.getItem("reg-local"))
-    );
-    console.log(
-      "UsuariosMOD: " + JSON.stringify(global.localStorage.getItem("reg-Users"))
-    );
-    //global.localStorage = storageMock();
-    //const localVue = createLocalVue();
-    //const wrapper = mount(IncomeExpense, { store, localVue });
 
-
-
-    wrapper.vm.$data.registry.transferSource = accountToAdd.name;
-    wrapper.vm.$data.registry.transferDestination = accountToAdd2.name;
+    wrapper.vm.$data.registry.transferSource = accountSource.accountName;
+    wrapper.vm.$data.registry.transferDestination = accountDestination.accountName;
     wrapper.vm.$data.registry.transferAmount = "109";
-    // wrapper.vm.$mount.findbalance = "2000";
+
+    wrapper.vm.$data.accounts = JSON.parse(
+      global.localStorage.getItem("reg-Users")
+    );
+
     wrapper.vm.transferRegistry();
     console.log(
-      "Probando Transferencia" +
+      "Probando Transferencia: " +
         " " +
         JSON.stringify(global.localStorage.getItem("reg-local"))
     );
-      const [incomefound] = JSON.parse(
-      global.localStorage.getItem("reg-local")
-    ).filter(item => item.name === "Savings");
+
     const [expensefound] = JSON.parse(
       global.localStorage.getItem("reg-local")
-    ).filter(item => item.name === "Salary");
+    ).filter(
+      item => item.name === "Unit Test" && item.type_search == "Expense"
+    );
+    const [incomefound] = JSON.parse(
+      global.localStorage.getItem("reg-local")
+    ).filter(item => item.name === "Test Unit" && item.type_searcg == "Income");
 
-    console.log(expensefound);
-    console.log(incomefound);
+    console.log("Expense " + expensefound.type_search);
+    console.log("Income " + incomefound.type_search);
 
     assert.equal(incomefound.type_search, "Income");
 
-    assert.equal(expensefound.type_search, "Expense"); 
+    assert.equal(expensefound.type_search, "Expense");
   });
 });

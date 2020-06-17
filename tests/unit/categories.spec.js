@@ -39,24 +39,31 @@ describe("Categories ", () => {
     localVue = createLocalVue();
   });
 
-  it("The LocalStorage category list is the same as the category data list and is not empty.", () => {
+  it("The LocalStorage category list is not empty.", () => {
     const wrapper = mount(Categories, {
       store,
       localVue
     });
-
-    const categories = wrapper.vm.$data.category_list;
+    let expectedlength = 2;
+    let categories = wrapper.vm.$data.category_list;
     assert.exists(categories);
+
+    assert.isAtLeast(categories.income.length, expectedlength); //>=
+
+    assert.isAtLeast(categories.expense.length, expectedlength);
+
     wrapper.vm.add();
+
     assert.exists(global.localStorage.getItem("reg-local-category"));
     assert.equal(
       global.localStorage.getItem("reg-local-category"),
       JSON.stringify(categories)
     );
     //console.log(categories);
+    //console.log(global.localStorage.getItem("reg-local-category"));
   });
 
-  it("The Logic to insert income category should works correctly.", () => {
+  it("The Logic to insert and delete income category should works correctly.", () => {
     const wrapper = mount(Categories, {
       store,
       localVue
@@ -72,10 +79,29 @@ describe("Categories ", () => {
       JSON.stringify(categoryToAdd)
     );
 
-    //console.log(global.localStorage.getItem("reg-local-category"));
+    /*console.log(
+      "\tAdd Income category:  " +
+        JSON.stringify(categoryToAdd) +
+        "\n\t => " +
+        global.localStorage.getItem("reg-local-category")
+    );*/
+
+    wrapper.vm.deleteCategory(categoryToAdd.name, selectedType);
+    assert.notInclude(
+      global.localStorage.getItem("reg-local-category"),
+      JSON.stringify(categoryToAdd)
+    );
+
+    /*console.log(
+      "\n\tDelete Income Category:  " +
+        JSON.stringify(categoryToAdd) +
+        "\n\t => " +
+        global.localStorage.getItem("reg-local-category") +
+        "\n\n"
+    );*/
   });
 
-  it("The Logic to insert expense category should works correctly.", () => {
+  it("The Logic to insert and delete expense category should works correctly.", () => {
     const wrapper = mount(Categories, {
       store,
       localVue
@@ -91,19 +117,25 @@ describe("Categories ", () => {
       JSON.stringify(categoryToAdd)
     );
 
-    //console.log(global.localStorage.getItem("reg-local-category"));
-  });
+    /*console.log(
+      "\tAdd Expense category:  " +
+        JSON.stringify(categoryToAdd) +
+        "\n\t => " +
+        global.localStorage.getItem("reg-local-category")
+    );*/
 
-  it("The income and expense lists in categories contain at least two elements each.", () => {
-    const wrapper = mount(Categories, {
-      store,
-      localVue
-    });
+    wrapper.vm.deleteCategory(categoryToAdd.name, selectedType);
+    assert.notInclude(
+      global.localStorage.getItem("reg-local-category"),
+      JSON.stringify(categoryToAdd)
+    );
 
-    const income_list = wrapper.vm.$data.category_list.income;
-    assert.isAtLeast(income_list.length, 2); //>=
-
-    const expense_list = wrapper.vm.$data.category_list.expense;
-    assert.isAtLeast(expense_list.length, 2);
+    /*console.log(
+      "\tDelete Expense Category:  " +
+        JSON.stringify(categoryToAdd) +
+        "\n\t => " +
+        global.localStorage.getItem("reg-local-category") +
+        "\n\n"
+    );*/
   });
 });

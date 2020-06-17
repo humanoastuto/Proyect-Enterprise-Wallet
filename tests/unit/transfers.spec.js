@@ -92,7 +92,8 @@ describe("Transfer.vue", () => {
     global.localStorage.setItem("reg-Users", JSON.stringify(accountmodified));
 
     wrapper.vm.$data.registry.transferSource = accountSource.accountName;
-    wrapper.vm.$data.registry.transferDestination = accountDestination.accountName;
+    wrapper.vm.$data.registry.transferDestination =
+      accountDestination.accountName;
     wrapper.vm.$data.registry.transferAmount = "109";
 
     wrapper.vm.$data.accounts = JSON.parse(

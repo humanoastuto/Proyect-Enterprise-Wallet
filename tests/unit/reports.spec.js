@@ -27,7 +27,7 @@ function storageMock() {
 }
 
 describe("Reports ", () => {
-  it("Create an income and check if it sorts well when changing", () => {
+  it("Create an income category transfer and check if it is shown first if filtered by income transfer", () => {
     global.localStorage = storageMock();
     const localVue = createLocalVue();
     const wrapper = shallowMount(IncomeExpense, { store, localVue });

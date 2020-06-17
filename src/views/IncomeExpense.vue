@@ -1,8 +1,10 @@
 <template>
   <div class="incomeexpense" id="app">
     <h3>{{ title }}</h3>
-
-   <div class="add-form" v-if="add_bool">
+    <!--
+      add transaction form view
+    -->
+    <div class="add-form" v-if="add_bool">
       <div class="add-form-content">
         <div class="form-group">
           <label>Name</label>
@@ -65,8 +67,9 @@
         </button>
       </div>
     </div>
- 
-
+    <!--
+      tranfer form view
+    -->
     <div class="add-form" v-if="transfer_bool">
       <div class="add-form-content">
         <div class="form-group">
@@ -111,6 +114,9 @@
         </button>
       </div>
     </div>
+    <!--
+      update transaction form view
+    -->
     <div class="add-form" v-if="upd_bool">
       <div class="add-form-content">
         <div class="form-group">
@@ -176,8 +182,9 @@
         </button>
       </div>
     </div>
-
-
+    <!--
+      Main View of Income Expense
+    -->
     <div class="form">
       <button
         class="btn btn-success"
@@ -189,7 +196,7 @@
         Add Transaction
       </button>
       <p />
-       <button
+      <button
         class="btn btn-success"
         @click="
           transfer_bool = true;
@@ -341,7 +348,6 @@ export default {
       upd_bool: false,
       transfer_bool: false,
       index_upd: 0,
-
       rangestart: new Date(Date.now()).toLocaleDateString(),
       typelist: [
         {
@@ -372,7 +378,8 @@ export default {
       category_list: {
         income: [{ name: "Transfer" }, { name: "Other" }],
         expense: [{ name: "Transfer" }, { name: "Other" }]
-      }
+      },
+      temporalAmount: 0
     };
   },
   methods: {
@@ -418,30 +425,34 @@ export default {
     },
     updateRegistry: function(index) {
       if (
-        this.registry.amount < this.findbalance &&
+        parseInt(this.findbalance) +
+          parseInt(this.temporalAmount) -
+          parseInt(this.registry.amount) >=
+          0 &&
         this.registry.type_search === "Expense"
       ) {
-      this.registrys[index].name = this.registry.name;
-      this.registrys[index].category = this.registry.category;
+        this.registrys[index].name = this.registry.name;
+        this.registrys[index].category = this.registry.category;
         this.registrys[index].type_search = this.registry.type_search;
-      this.registrys[index].amount = this.registry.amount;
-      localStorage.setItem("reg-local", JSON.stringify(this.registrys));
-      this.upd_bool = false;
+        this.registrys[index].amount = this.registry.amount;
+        localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+        this.upd_bool = false;
       } else if (
-        this.findbalance - this.registry.amount <= 0 &&
+        parseInt(this.findbalance) -
+          parseInt(this.temporalAmount) +
+          parseInt(this.registry.amount) >=
+          0 &&
         this.registry.type_search === "Income"
       ) {
-      this.registrys[index].name = this.registry.name;
-      this.registrys[index].category = this.registry.category;
-      this.registrys[index].type_search = this.registry.type_search;
-      this.registrys[index].amount = this.registry.amount;
-      localStorage.setItem("reg-local", JSON.stringify(this.registrys));
-      this.upd_bool = false;
-      }
-      else {
+        this.registrys[index].name = this.registry.name;
+        this.registrys[index].category = this.registry.category;
+        this.registrys[index].type_search = this.registry.type_search;
+        this.registrys[index].amount = this.registry.amount;
+        localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+        this.upd_bool = false;
+      } else {
         alert("Cant update this");
       }
-      
     },
     prevUpdate: function(index) {
       try {
@@ -449,6 +460,7 @@ export default {
         this.registry.category = this.registrys[index].category;
         this.registry.type_search = this.registrys[index].type_search;
         this.registry.amount = this.registrys[index].amount;
+        this.temporalAmount = this.registrys[index].amount;
       } catch (error) {
         console.log("Undefined variable as it's non existent");
       }
@@ -688,10 +700,6 @@ export default {
       );
     },
     findbalance() {
-      console.log("Cuentas disponibles" + JSON.stringify(this.accounts));
-       console.log("Transferencias" + this.registry.transferSource);
-       console.log("Nombre registro" + this.registry.name);
-
       let value = 0;
       this.accounts.forEach(element => {
         if (

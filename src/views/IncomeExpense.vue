@@ -209,6 +209,9 @@
       <label>Total Amount: {{ totalAmount }} $ </label>
       <label style="color: white;">Total Balance: {{ fieldBalances }} $ </label>
       <br />
+      <!--
+        Show sort options
+      -->
       <span>
         Sort by (First to appear in the Report, already sorted by date):
       </span>
@@ -263,6 +266,9 @@
       <span v-if="selectedOptionReport !== 'All'">
         Can't Delete while Report Daily, Weekly, Monthly, Yearly
       </span>
+      <!--
+        Show cards WITHOUT delete for reports
+      -->
       <br />
       <div class="col-xs-12" v-if="selectedOptionReport !== 'All'">
         <div
@@ -277,13 +283,6 @@
             @click="prevUpdate(index)"
           >
             <div class="card-block">
-              <button
-                v-if="selectedOptionReport === 'All'"
-                class="close"
-                @click="delRegistry(index)"
-              >
-                &times;
-              </button>
               <div class="card-title">Account: {{ registry.name }}</div>
               <div class="card-subtitle mb-2 text-muted">
                 Type: {{ registry.type_search }}
@@ -299,6 +298,9 @@
           </div>
         </div>
       </div>
+      <!--
+        Show cards WITH delete for reports
+      -->
       <div class="col-xs-12" v-else>
         <div
           class="col-xs-8 nota"
@@ -339,16 +341,25 @@ export default {
   name: "IncomeExpense",
   data() {
     return {
+      // Main Title
       title: "Registry of transaction",
-      total: 0,
+      // To sort by type_search
       selectedOption: "None",
+      // When sorting by type_search, sorts by categories first then show rest
       selectedOptionCategory: "All",
+      // Selects the kind of report you want to see
       selectedOptionReport: "All",
+      // Condition to show the add_transaction form
       add_bool: false,
+      // Condition to show the update transaction form
       upd_bool: false,
+      // Condition to show the transfer form
       transfer_bool: false,
+      // Variable that helps with updates
       index_upd: 0,
+      // Variable where reports starts counting the "weekly", "monthly", "yearly" range, rangeend is the one that limits it
       rangestart: new Date(Date.now()).toLocaleDateString(),
+      // type_search types
       typelist: [
         {
           name: "Income"
@@ -357,6 +368,7 @@ export default {
           name: "Expense"
         }
       ],
+      // main variable to add, update, transfer and modify
       registry: {
         name: "",
         category: "",
@@ -367,22 +379,24 @@ export default {
         transferDestination: "",
         transferAmount: ""
       },
+      // variable for temporal account
       account: {
         accountName: "",
         name: "",
         id: "",
         balance: 0
       },
+      // List of i/e called registry/s in the localStorage
       registrys: [],
+      // List of accounts existent in the localStorage
       accounts: [],
-      category_list: {
-        income: [{ name: "Transfer" }, { name: "Other" }],
-        expense: [{ name: "Transfer" }, { name: "Other" }]
-      },
-      temporalAmount: 0
+      // List of categories of type_search types existent in the localStorage
+      category_list: [],
+      temporalAmount: 0 // When updating, it helps to calculate logic
     };
   },
   methods: {
+    // Adds an i/e registrys
     addRegistry: function() {
       let { name, category, amount, type_search } = this.registry;
       if (
@@ -417,12 +431,25 @@ export default {
         }
       }
     },
+    // Deletes i/e registrys
     delRegistry: function(index) {
-      this.sortededregistrys.splice(index, 1);
-      localStorage.setItem("reg-local", JSON.stringify(this.sortededregistrys));
-      this.registrys = this.sortededregistrys;
-      this.upd_bool = false;
+      if (
+        (parseInt(this.findbalance) - parseInt(this.temporalAmount) >= 0 &&
+          this.registry.type_search === "Income") ||
+        this.registry.type_search === "Expense"
+      ) {
+        this.sortededregistrys.splice(index, 1);
+        localStorage.setItem(
+          "reg-local",
+          JSON.stringify(this.sortededregistrys)
+        );
+        this.registrys = this.sortededregistrys;
+        this.upd_bool = false;
+      } else {
+        alert("Can't delete this, balance will reach negative value");
+      }
     },
+    // Updates sections of the card of i/e registrys
     updateRegistry: function(index) {
       if (
         parseInt(this.findbalance) +
@@ -451,9 +478,10 @@ export default {
         localStorage.setItem("reg-local", JSON.stringify(this.registrys));
         this.upd_bool = false;
       } else {
-        alert("Cant update this");
+        alert("Cant update this, balance will reach negative value");
       }
     },
+    // Saves data in the transfer form from the card of the i/e selected
     prevUpdate: function(index) {
       try {
         this.registry.name = this.registrys[index].name;
@@ -467,17 +495,20 @@ export default {
       this.upd_bool = true;
       this.index_upd = index;
     },
+    // Cleans Text of all sections in the form of add transaction
     cleanText: function() {
       this.registry.name = "";
       this.registry.category = "";
       this.registry.type_search = "Income";
       this.registry.amount = "";
     },
+    // Cleans Text of all sections in the form of transfer
     cleanTextTransfer: function() {
       this.registry.transferSource = "";
       this.registry.transferDestination = "";
       this.registry.transferAmount = "";
     },
+    // Creates a transfer between two accounts
     transferRegistry: function() {
       console.log("TOTAL: " + this.findbalance);
       if (
@@ -543,6 +574,7 @@ export default {
     }
   },
   computed: {
+    //calculates range limit for report
     rangeend() {
       let fechasplit = this.rangestart.split("/");
       let rangeend;
@@ -571,6 +603,7 @@ export default {
       }
       return rangeend.toLocaleDateString();
     },
+    //Filters report to only that range
     reportedregistrys() {
       try {
         let fechastartsplit = this.rangestart.split("/");
@@ -606,6 +639,7 @@ export default {
       }
       return -1;
     },
+    //Sorts by categories and dates
     sortededregistrys() {
       let sortedregistrys =
         this.selectedOption === "None" ? this.registrys : [];
@@ -648,13 +682,16 @@ export default {
         cat1 = sortedregistrys.filter(
           item => item.category === this.selectedOptionCategory
         );
+        cat1.sort(comp);
         cat2 = sortedregistrys.filter(
           item => item.category !== this.selectedOptionCategory
         );
+        cat2.sort(comp);
         sortedregistrys = cat1.concat(cat2);
       }
       return sortedregistrys.concat(sortedregistrysparttwo);
     },
+    //calculates balance of all i/e's
     totalAmount() {
       let tamount = 0;
       if (this.selectedOptionReport === "All") {
@@ -672,6 +709,7 @@ export default {
       }
       return tamount;
     },
+    //calculates each account's balance
     fieldBalances() {
       const acc = this.accounts;
       acc.forEach(function(accobj) {
@@ -689,16 +727,19 @@ export default {
       });
       return 0;
     },
+    // Filters selected option in source for transfer
     dropdownListDestination() {
       return this.accounts.filter(
         item => item.accountName !== this.registry.transferSource
       );
     },
+    // Filters selected option in destination for transfer
     dropdownListSource() {
       return this.accounts.filter(
         item => item.accountName !== this.registry.transferDestination
       );
     },
+    // Finds balance value of the account related to the i/e being modified or transfered
     findbalance() {
       let value = 0;
       this.accounts.forEach(element => {

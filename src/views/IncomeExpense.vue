@@ -552,7 +552,7 @@ export default {
       }
     },
     // Si se escoge algun sort, con este método se guardara el orden del sort en localStorage
-    savesortedregistrys(){
+    savesortedregistrys() {
       if (
         this.selectedOption !== "None" &&
         this.selectedOptionReport === "All"
@@ -561,10 +561,7 @@ export default {
           "reg-local",
           JSON.stringify(this.sortededregistrys)
         );
-      } else if (
-        this.selectedOption !== "None" &&
-        this.selectedOptionReport !== "All"
-      ) {
+      } else if (this.selectedOptionReport !== "All") {
         localStorage.setItem(
           "reg-local",
           JSON.stringify(this.reportedregistrys)
@@ -656,8 +653,8 @@ export default {
         return rangedregistrys;
       } catch (error) {
         alert("Theres an issue with some date in the report");
+        return null;
       }
-      return -1;
     },
     //Sorts by categories and dates
     sortededregistrys() {

@@ -31,7 +31,6 @@ describe("Income.vue", () => {
     global.localStorage = storageMock();
     const localVue = createLocalVue();
     const wrapper = shallowMount(IncomeExpense, { store, localVue });
-
     const newregistry = {
       name: "Salary",
       category: "Category1",
@@ -43,9 +42,6 @@ describe("Income.vue", () => {
     wrapper.vm.$data.registry.amount = "100";
     wrapper.vm.$data.registry.type_search = "Income";
     wrapper.vm.addRegistry();
-    console.log(
-      "Probando" + JSON.stringify(global.localStorage.getItem("reg-local"))
-    );
     const [incomefound] = JSON.parse(
       global.localStorage.getItem("reg-local")
     ).filter(item => item.type_search === "Income");
@@ -101,11 +97,6 @@ describe("Transfer.vue", () => {
     );
 
     wrapper.vm.transferRegistry();
-    console.log(
-      "Probando Transferencia: " +
-        " " +
-        JSON.stringify(global.localStorage.getItem("reg-local"))
-    );
 
     const [expensefound] = JSON.parse(
       global.localStorage.getItem("reg-local")
@@ -115,9 +106,6 @@ describe("Transfer.vue", () => {
     const [incomefound] = JSON.parse(
       global.localStorage.getItem("reg-local")
     ).filter(item => item.name === "Test Unit" && item.type_search == "Income");
-
-    console.log("Expense " + expensefound.type_search);
-    console.log("Income " + incomefound.type_search);
 
     assert.equal(incomefound.type_search, "Income");
 

@@ -27,30 +27,26 @@ function storageMock() {
 }
 
 describe("Reports ", () => {
-  it("Create an income category transfer and check if it is shown first if filtered by income transfer", () => {
+  it("Create an income (transfer category) after other registrys, check if the first sorted value is a transfer when sorted by income transfer", () => {
     global.localStorage = storageMock();
     const localVue = createLocalVue();
     const wrapper = shallowMount(IncomeExpense, { store, localVue });
 
     const newregistry = {
       name: "Salary",
-      category: "Category1",
-      amount: "100",
+      category: "Transfer",
+      amount: "500",
       type_search: "Income",
       fecha: new Date(Date.now()).toLocaleDateString()
     };
-    wrapper.vm.$data.registry.name = "Salary";
-    wrapper.vm.$data.registry.category = "Category1";
-    wrapper.vm.$data.registry.amount = "100";
-    wrapper.vm.$data.registry.type_search = "Income";
-    wrapper.vm.$data.registry.fecha = "Income";
+    wrapper.vm.$data.registry = newregistry;
     wrapper.vm.addRegistry();
-    console.log(
-      "Testing" + JSON.stringify(global.localStorage.getItem("reg-local"))
-    );
-    const [incomefound] = JSON.parse(
-      global.localStorage.getItem("reg-local")
-    ).filter(item => item.type_search === "Income");
-    assert.equal(incomefound.type_search, newregistry.type_search);
+    wrapper.vm.$data.selectedOption = "Income";
+    wrapper.vm.$data.selectedOptionCategory = "Transfer";
+    wrapper.vm.$data.selectedOptionReport = "All";
+    wrapper.vm.savesortedregistrys();
+    const incomefound = JSON.parse(global.localStorage.getItem("reg-local"));
+    assert(incomefound[0].type_search, newregistry.type_search);
+    assert(incomefound[0].category, newregistry.category);
   });
 });

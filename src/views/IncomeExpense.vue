@@ -550,6 +550,26 @@ export default {
         this.transfer_bool = false;
         this.cleanTextTransfer();
       }
+    },
+    // Si se escoge algun sort, con este método se guardara el orden del sort en localStorage
+    savesortedregistrys(){
+      if (
+        this.selectedOption !== "None" &&
+        this.selectedOptionReport === "All"
+      ) {
+        localStorage.setItem(
+          "reg-local",
+          JSON.stringify(this.sortededregistrys)
+        );
+      } else if (
+        this.selectedOption !== "None" &&
+        this.selectedOptionReport !== "All"
+      ) {
+        localStorage.setItem(
+          "reg-local",
+          JSON.stringify(this.reportedregistrys)
+        );
+      }
     }
   },
   created: function() {

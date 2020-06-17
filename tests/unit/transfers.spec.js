@@ -56,7 +56,6 @@ describe("Transfer.vue", () => {
       store,
       localVue
     });
-    console.log(wrapper.html());
     const accountSource = {
       accountName: "Unit Test",
       name: "Testing",

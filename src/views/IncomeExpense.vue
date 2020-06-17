@@ -391,7 +391,10 @@ export default {
       // List of accounts existent in the localStorage
       accounts: [],
       // List of categories of type_search types existent in the localStorage
-      category_list: [],
+      category_list: {
+        income: [{ name: "Transfer" }, { name: "Other" }],
+        expense: [{ name: "Transfer" }, { name: "Other" }]
+      },
       temporalAmount: 0 // When updating, it helps to calculate logic
     };
   },
@@ -408,7 +411,7 @@ export default {
         alert("You must complete all the fields");
       } else if (
         this.registry.type_search === "Expense" &&
-        this.registry.amount > this.findbalance
+        this.registry.amount > this.findbalance_name
       ) {
         alert("Not enough balance in account for expense");
       } else {
@@ -431,12 +434,24 @@ export default {
         }
       }
     },
+    //findbalance from an specific element
+    findBalanceSpec: function(name) {
+      let value = 0;
+      this.accounts.forEach(element => {
+        if (element.accountName === name) {
+          value = element.balance;
+        }
+      });
+      return value;
+    },
     // Deletes i/e registrys
     delRegistry: function(index) {
       if (
-        (parseInt(this.findbalance) - parseInt(this.temporalAmount) >= 0 &&
-          this.registry.type_search === "Income") ||
-        this.registry.type_search === "Expense"
+        (parseInt(this.findBalanceSpec(this.registrys[index].name)) -
+          parseInt(this.registrys[index].amount) >=
+          0 &&
+          this.registrys[index].type_search === "Income") ||
+        this.registrys[index].type_search === "Expense"
       ) {
         this.sortededregistrys.splice(index, 1);
         localStorage.setItem(
@@ -448,11 +463,12 @@ export default {
       } else {
         alert("Can't delete this, balance will reach negative value");
       }
+      console.log(this.fieldBalances);
     },
     // Updates sections of the card of i/e registrys
     updateRegistry: function(index) {
       if (
-        parseInt(this.findbalance) +
+        parseInt(this.findbalance_name) +
           parseInt(this.temporalAmount) -
           parseInt(this.registry.amount) >=
           0 &&
@@ -465,7 +481,7 @@ export default {
         localStorage.setItem("reg-local", JSON.stringify(this.registrys));
         this.upd_bool = false;
       } else if (
-        parseInt(this.findbalance) -
+        parseInt(this.findbalance_name) -
           parseInt(this.temporalAmount) +
           parseInt(this.registry.amount) >=
           0 &&
@@ -732,6 +748,7 @@ export default {
       acc.forEach(function(accobj) {
         accobj.balance = 0;
       });
+      localStorage.setItem("reg-Users", JSON.stringify(acc));
       this.registrys.forEach(function(registry) {
         acc.forEach(function(account) {
           if (registry.name === account.accountName) {
@@ -760,10 +777,16 @@ export default {
     findbalance() {
       let value = 0;
       this.accounts.forEach(element => {
-        if (
-          element.accountName === this.registry.transferSource ||
-          element.accountName === this.registry.name
-        ) {
+        if (element.accountName === this.registry.transferSource) {
+          value = element.balance;
+        }
+      });
+      return value;
+    },
+    findbalance_name() {
+      let value = 0;
+      this.accounts.forEach(element => {
+        if (element.accountName === this.registry.name) {
           value = element.balance;
         }
       });

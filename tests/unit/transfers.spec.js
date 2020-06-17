@@ -114,7 +114,7 @@ describe("Transfer.vue", () => {
     );
     const [incomefound] = JSON.parse(
       global.localStorage.getItem("reg-local")
-    ).filter(item => item.name === "Test Unit" && item.type_searcg == "Income");
+    ).filter(item => item.name === "Test Unit" && item.type_search == "Income");
 
     console.log("Expense " + expensefound.type_search);
     console.log("Income " + incomefound.type_search);

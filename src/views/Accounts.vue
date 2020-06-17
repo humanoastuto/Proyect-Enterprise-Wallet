@@ -72,7 +72,9 @@
         >
           <div class="card-sytle" @click="prevUpdate(index)">
             <div>
-              <button class="close" @click.stop="deleteUser(index)">&times;</button>
+              <button class="close" @click.stop="deleteUser(index)">
+                &times;
+              </button>
               <div class="card-title blanco" style="margin-top: 10px">
                 Account Name: {{ user.accountName }}
               </div>
@@ -126,7 +128,7 @@ export default {
         alert("You must complete all the fields");
         this.canCreate = false;
       } else {
-        if (!isNaN(parseInt(this.user.id))) {
+        if (!isNaN(this.user.id)) {
           for (let i = 0; i < this.usersList.length; i++) {
             if (this.usersList[i].accountName === this.user.accountName) {
               this.isTaken = true;

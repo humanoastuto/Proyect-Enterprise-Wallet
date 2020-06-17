@@ -7,7 +7,6 @@
       <span class="navbar-brand mb-0 h1">Virtual Wallet</span>
       <router-link to="/">Home</router-link> |
       <router-link to="/incomeexpense">IncomeExpense</router-link> |
-      <router-link to="/transfer">Transfer</router-link> |
       <router-link to="/accounts">Accounts</router-link> |
       <router-link to="/categories">Categories</router-link>
     </nav>

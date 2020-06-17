@@ -1,8 +1,7 @@
-import { expect, assert } from "chai";
-import { shallowMount, createLocalVue } from "@vue/test-utils";
-import HelloWorld from "@/components/HelloWorld.vue";
+import { assert } from "chai";
+import { shallowMount, createLocalVue, mount } from "@vue/test-utils";
+import Accounts from "@/views/Accounts.vue";
 import IncomeExpense from "@/views/IncomeExpense.vue";
-import Transfer from "@/views/Transfer.vue";
 import store from "@/store";
 
 function storageMock() {
@@ -27,21 +26,11 @@ function storageMock() {
     }
   };
 }
-describe("HelloWorld.vue", () => {
-  it("renders props.msg when passed", () => {
-    const msg = "new message";
-    const wrapper = shallowMount(HelloWorld, {
-      propsData: { msg }
-    });
-    expect(wrapper.text()).to.include(msg);
-  });
-});
 describe("Income.vue", () => {
   it("Create transaction verify it is an Income", () => {
     global.localStorage = storageMock();
     const localVue = createLocalVue();
     const wrapper = shallowMount(IncomeExpense, { store, localVue });
-
     const newregistry = {
       name: "Salary",
       category: "Category1",
@@ -53,9 +42,6 @@ describe("Income.vue", () => {
     wrapper.vm.$data.registry.amount = "100";
     wrapper.vm.$data.registry.type_search = "Income";
     wrapper.vm.addRegistry();
-    console.log(
-      "Probando" + JSON.stringify(global.localStorage.getItem("reg-local"))
-    );
     const [incomefound] = JSON.parse(
       global.localStorage.getItem("reg-local")
     ).filter(item => item.type_search === "Income");
@@ -66,26 +52,60 @@ describe("Transfer.vue", () => {
   it("Create transfer and make sure the Income is made to destination and Expense to source", () => {
     global.localStorage = storageMock();
     const localVue = createLocalVue();
-    const wrapper = shallowMount(Transfer, { store, localVue });
+    const wrapper = mount(Accounts, IncomeExpense, {
+      store,
+      localVue
+    });
+    console.log(wrapper.html());
+    const accountSource = {
+      accountName: "Unit Test",
+      name: "Testing",
+      id: 1234567
+    };
+    const accountDestination = {
+      accountName: "Test Unit",
+      name: "Testing1",
+      id: 123490
+    };
+    wrapper.vm.$data.user = accountSource;
+    wrapper.vm.addUser();
 
-    wrapper.vm.$data.registry.transferSource = "Salary";
-    wrapper.vm.$data.registry.transferDestination = "Savings";
-    wrapper.vm.$data.registry.transferAmount = "1090";
+    wrapper.vm.$data.user = accountDestination;
+    wrapper.vm.addUser();
+
+    const registryToAdd = {
+      name: "Unit Test",
+      category: "Transfer",
+      amount: "1000",
+      type_search: "Income",
+      fecha: new Date(Date.now()).toLocaleDateString()
+    };
+    wrapper.vm.$data.registry = registryToAdd;
+    wrapper.vm.addRegistry();
+    let accountmodified = JSON.parse(global.localStorage.getItem("reg-Users"));
+    accountmodified[0].balance = 1000;
+
+    global.localStorage.setItem("reg-Users", JSON.stringify(accountmodified));
+
+    wrapper.vm.$data.registry.transferSource = accountSource.accountName;
+    wrapper.vm.$data.registry.transferDestination =
+      accountDestination.accountName;
+    wrapper.vm.$data.registry.transferAmount = "109";
+
+    wrapper.vm.$data.accounts = JSON.parse(
+      global.localStorage.getItem("reg-Users")
+    );
+
     wrapper.vm.transferRegistry();
-    console.log(
-      "Probando" +
-        " " +
-        JSON.stringify(global.localStorage.getItem("reg-local"))
+
+    const [expensefound] = JSON.parse(
+      global.localStorage.getItem("reg-local")
+    ).filter(
+      item => item.name === "Unit Test" && item.type_search == "Expense"
     );
     const [incomefound] = JSON.parse(
       global.localStorage.getItem("reg-local")
-    ).filter(item => item.name === "Savings");
-    const [expensefound] = JSON.parse(
-      global.localStorage.getItem("reg-local")
-    ).filter(item => item.name === "Salary");
-
-    console.log(expensefound);
-    console.log(incomefound);
+    ).filter(item => item.name === "Test Unit" && item.type_search == "Income");
 
     assert.equal(incomefound.type_search, "Income");
 

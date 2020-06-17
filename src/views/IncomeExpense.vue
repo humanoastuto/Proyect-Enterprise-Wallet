@@ -1,7 +1,9 @@
 <template>
   <div class="incomeexpense" id="app">
     <h3>{{ title }}</h3>
-
+    <!--
+      add transaction form view
+    -->
     <div class="add-form" v-if="add_bool">
       <div class="add-form-content">
         <div class="form-group">
@@ -65,7 +67,56 @@
         </button>
       </div>
     </div>
-
+    <!--
+      tranfer form view
+    -->
+    <div class="add-form" v-if="transfer_bool">
+      <div class="add-form-content">
+        <div class="form-group">
+          <label>Transfer form:</label>
+          <select
+            class="browser-default custom-select"
+            v-model="registry.transferSource"
+          >
+            <option v-for="(account, index) in dropdownListSource" :key="index">
+              {{ account.accountName }}
+            </option>
+          </select>
+        </div>
+        <label>Transfer to:</label>
+        <select
+          class="browser-default custom-select"
+          v-model="registry.transferDestination"
+        >
+          <option
+            v-for="(account, index) in dropdownListDestination"
+            :key="index"
+          >
+            {{ account.accountName }}
+          </option>
+        </select>
+        <div class="form-group">
+          <label>Amount</label>
+          <input class="form-control" v-model="registry.transferAmount" />
+        </div>
+        <button class="btn btn-success" @click="transferRegistry()">
+          Confirm
+        </button>
+        <button
+          class="btn btn-danger"
+          @click="
+            transfer_bool = false;
+            cleanTextTransfer();
+          "
+          style="margin-left: 20px;"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+    <!--
+      update transaction form view
+    -->
     <div class="add-form" v-if="upd_bool">
       <div class="add-form-content">
         <div class="form-group">
@@ -131,15 +182,36 @@
         </button>
       </div>
     </div>
-
+    <!--
+      Main View of Income Expense
+    -->
     <div class="form">
-      <button class="btn btn-success" @click="add_bool = true; cleanText();">
+      <button
+        class="btn btn-success"
+        @click="
+          add_bool = true;
+          cleanText();
+        "
+      >
         Add Transaction
+      </button>
+      <p />
+      <button
+        class="btn btn-success"
+        @click="
+          transfer_bool = true;
+          cleanTextTransfer();
+        "
+      >
+        Make Transfer
       </button>
       <br />
       <label>Total Amount: {{ totalAmount }} $ </label>
       <label style="color: white;">Total Balance: {{ fieldBalances }} $ </label>
       <br />
+      <!--
+        Show sort options
+      -->
       <span>
         Sort by (First to appear in the Report, already sorted by date):
       </span>
@@ -194,6 +266,9 @@
       <span v-if="selectedOptionReport !== 'All'">
         Can't Delete while Report Daily, Weekly, Monthly, Yearly
       </span>
+      <!--
+        Show cards WITHOUT delete for reports
+      -->
       <br />
       <div class="col-xs-12" v-if="selectedOptionReport !== 'All'">
         <div
@@ -208,13 +283,6 @@
             @click="prevUpdate(index)"
           >
             <div class="card-block">
-              <button
-                v-if="selectedOptionReport === 'All'"
-                class="close"
-                @click="delRegistry(index)"
-              >
-                &times;
-              </button>
               <div class="card-title">Account: {{ registry.name }}</div>
               <div class="card-subtitle mb-2 text-muted">
                 Type: {{ registry.type_search }}
@@ -230,6 +298,9 @@
           </div>
         </div>
       </div>
+      <!--
+        Show cards WITH delete for reports
+      -->
       <div class="col-xs-12" v-else>
         <div
           class="col-xs-8 nota"
@@ -270,15 +341,25 @@ export default {
   name: "IncomeExpense",
   data() {
     return {
+      // Main Title
       title: "Registry of transaction",
-      total: 0,
+      // To sort by type_search
       selectedOption: "None",
+      // When sorting by type_search, sorts by categories first then show rest
       selectedOptionCategory: "All",
+      // Selects the kind of report you want to see
       selectedOptionReport: "All",
+      // Condition to show the add_transaction form
       add_bool: false,
+      // Condition to show the update transaction form
       upd_bool: false,
+      // Condition to show the transfer form
+      transfer_bool: false,
+      // Variable that helps with updates
       index_upd: 0,
+      // Variable where reports starts counting the "weekly", "monthly", "yearly" range, rangeend is the one that limits it
       rangestart: new Date(Date.now()).toLocaleDateString(),
+      // type_search types
       typelist: [
         {
           name: "Income"
@@ -287,28 +368,35 @@ export default {
           name: "Expense"
         }
       ],
+      // main variable to add, update, transfer and modify
       registry: {
         name: "",
         category: "",
         amount: "",
         type_search: "Income",
-        fecha: ""
+        fecha: "",
+        transferSource: "",
+        transferDestination: "",
+        transferAmount: ""
       },
+      // variable for temporal account
       account: {
         accountName: "",
         name: "",
         id: "",
         balance: 0
       },
+      // List of i/e called registry/s in the localStorage
       registrys: [],
+      // List of accounts existent in the localStorage
       accounts: [],
-      category_list: {
-        income: [{ name: "Transfer" }, { name: "Other" }],
-        expense: [{ name: "Transfer" }, { name: "Other" }]
-      }
+      // List of categories of type_search types existent in the localStorage
+      category_list: [],
+      temporalAmount: 0 // When updating, it helps to calculate logic
     };
   },
   methods: {
+    // Adds an i/e registrys
     addRegistry: function() {
       let { name, category, amount, type_search } = this.registry;
       if (
@@ -318,9 +406,14 @@ export default {
         this.registry.type_search === ""
       ) {
         alert("You must complete all the fields");
+      } else if (
+        this.registry.type_search === "Expense" &&
+        this.registry.amount > this.findbalance
+      ) {
+        alert("Not enough balance in account for expense");
       } else {
         if (
-          !isNaN(parseInt(this.registry.amount)) &&
+          !isNaN(this.registry.amount) &&
           parseInt(this.registry.amount) > 0
         ) {
           this.registrys.push({
@@ -338,37 +431,145 @@ export default {
         }
       }
     },
+    // Deletes i/e registrys
     delRegistry: function(index) {
-      this.sortededregistrys.splice(index, 1);
-      localStorage.setItem("reg-local", JSON.stringify(this.sortededregistrys));
-      this.registrys = this.sortededregistrys;
-      this.upd_bool = false;
+      if (
+        (parseInt(this.findbalance) - parseInt(this.temporalAmount) >= 0 &&
+          this.registry.type_search === "Income") ||
+        this.registry.type_search === "Expense"
+      ) {
+        this.sortededregistrys.splice(index, 1);
+        localStorage.setItem(
+          "reg-local",
+          JSON.stringify(this.sortededregistrys)
+        );
+        this.registrys = this.sortededregistrys;
+        this.upd_bool = false;
+      } else {
+        alert("Can't delete this, balance will reach negative value");
+      }
     },
+    // Updates sections of the card of i/e registrys
     updateRegistry: function(index) {
-      this.registrys[index].name = this.registry.name;
-      this.registrys[index].category = this.registry.category;
-      this.registrys[index].type_search = this.registry.type_search;
-      this.registrys[index].amount = this.registry.amount;
-      localStorage.setItem("reg-local", JSON.stringify(this.registrys));
-      this.upd_bool = false;
+      if (
+        parseInt(this.findbalance) +
+          parseInt(this.temporalAmount) -
+          parseInt(this.registry.amount) >=
+          0 &&
+        this.registry.type_search === "Expense"
+      ) {
+        this.registrys[index].name = this.registry.name;
+        this.registrys[index].category = this.registry.category;
+        this.registrys[index].type_search = this.registry.type_search;
+        this.registrys[index].amount = this.registry.amount;
+        localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+        this.upd_bool = false;
+      } else if (
+        parseInt(this.findbalance) -
+          parseInt(this.temporalAmount) +
+          parseInt(this.registry.amount) >=
+          0 &&
+        this.registry.type_search === "Income"
+      ) {
+        this.registrys[index].name = this.registry.name;
+        this.registrys[index].category = this.registry.category;
+        this.registrys[index].type_search = this.registry.type_search;
+        this.registrys[index].amount = this.registry.amount;
+        localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+        this.upd_bool = false;
+      } else {
+        alert("Cant update this, balance will reach negative value");
+      }
     },
+    // Saves data in the transfer form from the card of the i/e selected
     prevUpdate: function(index) {
       try {
         this.registry.name = this.registrys[index].name;
         this.registry.category = this.registrys[index].category;
         this.registry.type_search = this.registrys[index].type_search;
         this.registry.amount = this.registrys[index].amount;
+        this.temporalAmount = this.registrys[index].amount;
       } catch (error) {
         console.log("Undefined variable as it's non existent");
       }
       this.upd_bool = true;
       this.index_upd = index;
     },
+    // Cleans Text of all sections in the form of add transaction
     cleanText: function() {
       this.registry.name = "";
       this.registry.category = "";
       this.registry.type_search = "Income";
       this.registry.amount = "";
+    },
+    // Cleans Text of all sections in the form of transfer
+    cleanTextTransfer: function() {
+      this.registry.transferSource = "";
+      this.registry.transferDestination = "";
+      this.registry.transferAmount = "";
+    },
+    // Creates a transfer between two accounts
+    transferRegistry: function() {
+      console.log("TOTAL: " + this.findbalance);
+      if (
+        this.registry.transferSource === "" ||
+        this.registry.transferDestination === "" ||
+        this.registry.transferAmount === ""
+      ) {
+        alert("You must complete all the fields");
+      } else if (this.registry.transferAmount > this.findbalance) {
+        alert("Transfer amount exceeds total: " + this.findbalance);
+      } else if (this.registry.transferAmount <= "0") {
+        alert("Can't transfer nothing");
+      } else if (isNaN(this.registry.transferAmount)) {
+        alert("Value must me number");
+      } else {
+        let name = this.registry.transferSource;
+        let category = "Transfer";
+        let amount = this.registry.transferAmount;
+        let type_search = "Expense";
+        this.registrys.push({
+          name,
+          category,
+          amount,
+          type_search,
+          fecha: new Date(Date.now()).toLocaleDateString()
+        });
+        name = this.registry.transferDestination;
+        category = "Transfer";
+        amount = this.registry.transferAmount;
+        type_search = "Income";
+        this.registrys.push({
+          name,
+          category,
+          amount,
+          type_search,
+          fecha: new Date(Date.now()).toLocaleDateString()
+        });
+        localStorage.setItem("reg-local", JSON.stringify(this.registrys));
+        this.transfer_bool = false;
+        this.cleanTextTransfer();
+      }
+    },
+    // Si se escoge algun sort, con este método se guardara el orden del sort en localStorage
+    savesortedregistrys(){
+      if (
+        this.selectedOption !== "None" &&
+        this.selectedOptionReport === "All"
+      ) {
+        localStorage.setItem(
+          "reg-local",
+          JSON.stringify(this.sortededregistrys)
+        );
+      } else if (
+        this.selectedOption !== "None" &&
+        this.selectedOptionReport !== "All"
+      ) {
+        localStorage.setItem(
+          "reg-local",
+          JSON.stringify(this.reportedregistrys)
+        );
+      }
     }
   },
   created: function() {
@@ -393,6 +594,7 @@ export default {
     }
   },
   computed: {
+    //calculates range limit for report
     rangeend() {
       let fechasplit = this.rangestart.split("/");
       let rangeend;
@@ -421,6 +623,7 @@ export default {
       }
       return rangeend.toLocaleDateString();
     },
+    //Filters report to only that range
     reportedregistrys() {
       try {
         let fechastartsplit = this.rangestart.split("/");
@@ -456,6 +659,7 @@ export default {
       }
       return -1;
     },
+    //Sorts by categories and dates
     sortededregistrys() {
       let sortedregistrys =
         this.selectedOption === "None" ? this.registrys : [];
@@ -498,13 +702,16 @@ export default {
         cat1 = sortedregistrys.filter(
           item => item.category === this.selectedOptionCategory
         );
+        cat1.sort(comp);
         cat2 = sortedregistrys.filter(
           item => item.category !== this.selectedOptionCategory
         );
+        cat2.sort(comp);
         sortedregistrys = cat1.concat(cat2);
       }
       return sortedregistrys.concat(sortedregistrysparttwo);
     },
+    //calculates balance of all i/e's
     totalAmount() {
       let tamount = 0;
       if (this.selectedOptionReport === "All") {
@@ -522,11 +729,12 @@ export default {
       }
       return tamount;
     },
+    //calculates each account's balance
     fieldBalances() {
       const acc = this.accounts;
       acc.forEach(function(accobj) {
         accobj.balance = 0;
-      })
+      });
       this.registrys.forEach(function(registry) {
         acc.forEach(function(account) {
           if (registry.name === account.accountName) {
@@ -538,6 +746,31 @@ export default {
         });
       });
       return 0;
+    },
+    // Filters selected option in source for transfer
+    dropdownListDestination() {
+      return this.accounts.filter(
+        item => item.accountName !== this.registry.transferSource
+      );
+    },
+    // Filters selected option in destination for transfer
+    dropdownListSource() {
+      return this.accounts.filter(
+        item => item.accountName !== this.registry.transferDestination
+      );
+    },
+    // Finds balance value of the account related to the i/e being modified or transfered
+    findbalance() {
+      let value = 0;
+      this.accounts.forEach(element => {
+        if (
+          element.accountName === this.registry.transferSource ||
+          element.accountName === this.registry.name
+        ) {
+          value = element.balance;
+        }
+      });
+      return value;
     }
   }
 };

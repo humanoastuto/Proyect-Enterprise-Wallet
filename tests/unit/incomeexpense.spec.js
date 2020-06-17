@@ -3,7 +3,7 @@ import { assert } from "chai";
 // VUE TEST UTILS
 import { createLocalVue, mount } from "@vue/test-utils";
 // components
-//import Accounts from "@/views/Accounts.vue";
+import Accounts from "@/views/Accounts.vue";
 import IncomeExpense from "@/views/IncomeExpense.vue";
 //import Categories from "@/views/Categories.vue";
 /* Recommended for actions/mutations */
@@ -44,7 +44,7 @@ describe("IncomeExpense transactions", () => {
   });
 
   it("Transaction succesfully updated", () => {
-    const wrapper = mount(IncomeExpense, {
+    const wrapper = mount(Accounts, IncomeExpense, {
       store,
       localVue
     });
@@ -73,5 +73,45 @@ describe("IncomeExpense transactions", () => {
     wrapper.vm.updateRegistry(0);
     [registryFound] = JSON.parse(global.localStorage.getItem("reg-local"));
     assert.equal(registryFound.name, registryUpdated.name);
+  });
+  it("Transaction (Expense) succesfully deleted", () => {
+    const wrapper = mount(Accounts, IncomeExpense, {
+      store,
+      localVue
+    });
+
+    const accountSource = {
+      accountName: "Unit Test",
+      name: "Testing",
+      id: 1234567
+    };
+    wrapper.vm.$data.user = accountSource;
+    wrapper.vm.addUser();
+    let accountmodified = JSON.parse(global.localStorage.getItem("reg-Users"));
+    accountmodified[0].balance = 1000;
+    global.localStorage.setItem("reg-Users", JSON.stringify(accountmodified));
+    wrapper.vm.$data.accounts = JSON.parse(
+      global.localStorage.getItem("reg-Users")
+    );
+
+    const registryToAdd = {
+      name: "Unit Test",
+      category: "Transfer",
+      amount: "500",
+      type_search: "Expense",
+      fecha: new Date(Date.now()).toLocaleDateString()
+    };
+    wrapper.vm.$data.registry = registryToAdd;
+    wrapper.vm.addRegistry();
+    console.log(
+      "Mostrando Expense añadido: " + JSON.stringify(global.localStorage.getItem("reg-local"))
+    );
+    let registryFound = JSON.parse(global.localStorage.getItem("reg-local"));
+    assert.equal(registryFound[0].name, registryToAdd.name);
+    wrapper.vm.delRegistry(0);
+    assert.notEqual(
+      JSON.parse(global.localStorage.getItem("reg-local")),
+      registryFound
+    );
   });
 });
